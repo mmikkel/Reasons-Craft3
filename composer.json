@@ -11,8 +11,8 @@
         "reasons"
     ],
     "support": {
-        "docs": "https://github.com/mmikkel/reasons/blob/master/README.md",
-        "issues": "https://github.com/mmikkel/reasons/issues"
+        "docs": "https://github.com/mmikkel/Reasons-Craft3/blob/master/README.md",
+        "issues": "https://github.com/mmikkel/Reasons-Craft3/issues"
     },
     "license": "MIT",
     "authors": [
@@ -34,8 +34,8 @@
         "handle": "reasons",
         "developer": "Mats Mikkel Rummelhoff",
         "developerUrl": "https://vaersaagod.no",
-        "documentationUrl": "https://github.com/mmikkel/reasons/blob/master/README.md",
-        "changelogUrl": "https://raw.githubusercontent.com/mmikkel/reasons/master/CHANGELOG.md",
+        "documentationUrl": "https://github.com/mmikkel/Reasons-Craft3/blob/master/README.md",
+        "changelogUrl": "https://github.com/mmikkel/Reasons-Craft3/blob/master/CHANGELOG.md",
         "class": "mmikkel\\reasons\\Reasons"
     }
 }
