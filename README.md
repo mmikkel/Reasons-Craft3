@@ -38,7 +38,7 @@ To install the plugin, follow these instructions.
 
 Yeah, [I wasn't gonna do this](https://github.com/mmikkel/Reasons-Craft/wiki/Statement-on-Reasons-2,-Matrix-and-Craft-3).  
 
-Reasons for Craft 3 is basically the exact same plugin as [Reasons for Craft 2](https://github.com/mmikkel/Reasons-Craft). I spent very little time on the port; basically just copy-pasted the JavaScript and made sure it works with the new Drafts and Preview system in Craft 3s.  
+Reasons for Craft 3 is basically the exact same plugin as [Reasons for Craft 2](https://github.com/mmikkel/Reasons-Craft). I spent very little time on the port; basically just copy-pasted the JavaScript and made sure it works with the new Drafts and Preview system in Craft 3.  
 
 _I'm not likely to do any additional development on this plugin, beyond making sure that it works as-is with upcoming Craft 3.x releases (if possible)._ Consider it on life support and a stop-gap solution until Pixel & Tonic [finally add conditionals to core](https://github.com/craftcms/cms/issues/805).
 
