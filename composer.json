@@ -1,0 +1,41 @@
+{
+    "name": "mmikkel/reasons",
+    "description": "Adds conditionals to field layouts.",
+    "type": "craft-plugin",
+    "version": "2.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "reasons"
+    ],
+    "support": {
+        "docs": "https://github.com/mmikkel/reasons/blob/master/README.md",
+        "issues": "https://github.com/mmikkel/reasons/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mats Mikkel Rummelhoff",
+            "homepage": "https://vaersaagod.no"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.4.22.1"
+    },
+    "autoload": {
+        "psr-4": {
+          "mmikkel\\reasons\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Reasons",
+        "handle": "reasons",
+        "developer": "Mats Mikkel Rummelhoff",
+        "developerUrl": "https://vaersaagod.no",
+        "documentationUrl": "https://github.com/mmikkel/reasons/blob/master/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/mmikkel/reasons/master/CHANGELOG.md",
+        "class": "mmikkel\\reasons\\Reasons"
+    }
+}
