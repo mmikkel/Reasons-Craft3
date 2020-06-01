@@ -60,10 +60,32 @@ class ReasonsService extends Component
      */
     public function saveFieldLayoutConditionals(int $fieldLayoutId, $conditionals): bool
     {
-        $record = new Conditionals();
+        $record = Conditionals::findOne([
+            'fieldLayoutId' => $fieldLayoutId,
+        ]);
+        if (!$record) {
+            $record = new Conditionals();
+        }
         $record->fieldLayoutId = $fieldLayoutId;
         $record->conditionals = $conditionals;
         return $record->save();
+    }
+
+    /**
+     * @param int $fieldLayoutId
+     * @return bool
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function deleteFieldLayoutConditionals(int $fieldLayoutId): bool
+    {
+        $record = Conditionals::findOne([
+            'fieldLayoutId' => $fieldLayoutId,
+        ]);
+        if (!$record) {
+            return false;
+        }
+        return $record->delete();
     }
 
     /**
@@ -170,25 +192,6 @@ class ReasonsService extends Component
             if ($usersFieldLayout) {
                 $sources['users'] = (int)$usersFieldLayout->id;
             }
-
-            // Solspace Calendar - TODO
-            /*$solspaceCalendarPlugin = craft()->plugins->getPlugin('calendar');
-            if ($solspaceCalendarPlugin && $solspaceCalendarPlugin->getDeveloper() === 'Solspace') {
-                // Before 1.7.0, Solspace Calendar used a single Field Layout for all calendars. Let's try and support both the old and the new
-                if (version_compare($solspaceCalendarPlugin->getVersion(), '1.7.0', '>=')) {
-                    $solspaceCalendars = craft()->calendar_calendars->getAllCalendars();
-                    if ($solspaceCalendars && is_array($solspaceCalendars) && !empty($solspaceCalendars)) {
-                        foreach ($solspaceCalendars as $solspaceCalendar) {
-                            $sources['solspaceCalendar:'.$solspaceCalendar->id] = $solspaceCalendar->fieldLayoutId;
-                        }
-                    }
-                } else {
-                    $solspaceCalendarFieldLayout = craft()->fields->getLayoutByType('Calendar_Event');
-                    if ($solspaceCalendarFieldLayout) {
-                        $sources['solspaceCalendar'] = $solspaceCalendarFieldLayout->id;
-                    }
-                }
-            }*/
 
             $this->sources = $sources;
 

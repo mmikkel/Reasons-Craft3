@@ -150,9 +150,13 @@ class Reasons extends Plugin
             Fields::EVENT_AFTER_SAVE_FIELD_LAYOUT,
             function (FieldLayoutEvent $event) {
                 $conditionals = Craft::$app->getRequest()->getBodyParam('_reasons', null);
-                if ($conditionals && $fieldLayout = $event->layout) {
+                if ($conditionals !== null && $fieldLayout = $event->layout) {
                     try {
-                        Reasons::getInstance()->reasons->saveFieldLayoutConditionals((int)$fieldLayout->id, $conditionals);
+                        if ($conditionals) {
+                            Reasons::getInstance()->reasons->saveFieldLayoutConditionals((int)$fieldLayout->id, $conditionals);
+                        } else {
+                            Reasons::getInstance()->reasons->deleteFieldLayoutConditionals((int)$fieldLayout->id);
+                        }
                     } catch (\Throwable $e) {
                         Craft::error($e->getMessage(), __METHOD__);
                         if (Craft::$app->getConfig()->getGeneral()->devMode) {
