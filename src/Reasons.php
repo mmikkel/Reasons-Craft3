@@ -10,6 +10,11 @@
 
 namespace mmikkel\reasons;
 
+use mmikkel\reasons\assetbundles\reasons\ReasonsAssetBundle;
+use mmikkel\reasons\services\ReasonsService;
+
+use Craft;
+use craft\base\Plugin;
 use craft\elements\Asset;
 use craft\elements\Category;
 use craft\elements\Entry;
@@ -18,14 +23,9 @@ use craft\elements\Tag;
 use craft\elements\User;
 use craft\events\FieldEvent;
 use craft\events\FieldLayoutEvent;
-use craft\services\Fields;
-use mmikkel\reasons\assetbundles\reasons\ReasonsAssetBundle;
-use mmikkel\reasons\services\ReasonsService;
-
-use Craft;
-use craft\base\Plugin;
 use craft\events\PluginEvent;
 use craft\events\TemplateEvent;
+use craft\services\Fields;
 use craft\services\Plugins;
 use craft\web\View;
 

@@ -1,4 +1,12 @@
 <?php
+/**
+ * Reasons plugin for Craft CMS 3.x
+ *
+ * Adds conditionals to field layouts.
+ *
+ * @link      https://vaersaagod.no
+ * @copyright Copyright (c) 2020 Mats Mikkel Rummelhoff
+ */
 
 namespace mmikkel\reasons\assetbundles\reasons;
 
@@ -13,8 +21,14 @@ use craft\helpers\Json;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
 use craft\web\View;
+
 use mmikkel\reasons\Reasons;
 
+/**
+ * @author    Mats Mikkel Rummelhoff
+ * @package   Reasons
+ * @since     2.0.0
+ */
 class ReasonsAssetBundle extends AssetBundle
 {
 
