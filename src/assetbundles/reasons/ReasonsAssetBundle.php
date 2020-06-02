@@ -12,6 +12,7 @@ namespace mmikkel\reasons\assetbundles\reasons;
 
 use Craft;
 use craft\base\Element;
+use craft\elements\Asset;
 use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\GlobalSet;
@@ -71,28 +72,33 @@ class ReasonsAssetBundle extends AssetBundle
 
         // Check if there's a revisionId in the GET params
         // We have to do this to account for Craft's new draft/revision system, and the new DraftEditor JS component
+        // I'm just gonna add all element types to this, even if it only applies to Entries right now
+        // If I'm lucky, this'll turn out to be future proof
         $revisionId = (int)Craft::$app->getRequest()->getParam('revisionId');
         if ($revisionId) {
             $sourceElementId = (int)Element::find()->revisionId($revisionId)->scalar();
             if ($sourceElementId && $element = Craft::$app->getElements()->getElementById($sourceElementId)) {
                 $elementType = \get_class($element);
-                $elementContext = null;
+                $renderContext = null;
                 if ($elementType === Entry::class) {
                     /** @var Entry $element */
-                    $elementContext = "entryType:{$element->typeId}";
+                    $renderContext = "entryType:{$element->typeId}";
                 } else if ($elementType === Category::class) {
                     /** @var Category $element */
-                    $elementContext = "categoryGroup:{$element->groupId}";
+                    $renderContext = "categoryGroup:{$element->groupId}";
                 } else if ($elementType === Tag::class) {
                     /** @var Tag $element */
-                    $elementContext = "tagGroup:{$element->groupId}";
+                    $renderContext = "tagGroup:{$element->groupId}";
                 } else if ($elementType === GlobalSet::class) {
                     /** @var GlobalSet $element */
-                    $elementContext = "globalSet:{$element->id}";
+                    $renderContext = "globalSet:{$element->id}";
                 } else if ($elementType === User::class) {
-                    $elementContext = 'users';
+                    $renderContext = 'users';
+                } else if ($elementType === Asset::class) {
+                    /** @var Asset $element */
+                    $renderContext = "assetSource:{$element->volumeId}";
                 }
-                $data['renderContext'] = $elementContext;
+                $data['renderContext'] = $renderContext;
             }
         } else {
             // Sadly, the new Asset edit view doesn't have `<input type="hidden" name="volumeId"/>` input – so we'll need to work around that, too
