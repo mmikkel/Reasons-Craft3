@@ -11,13 +11,14 @@
 namespace mmikkel\reasons\services;
 
 use mmikkel\reasons\Reasons;
-use mmikkel\reasons\records\Conditionals;
 
 use Craft;
+use craft\db\Query;
 use craft\base\Component;
 use craft\base\FieldInterface;
 use craft\elements\User;
-
+use craft\events\ConfigEvent;
+use craft\events\RebuildConfigEvent;
 use craft\fields\Assets;
 use craft\fields\Categories;
 use craft\fields\Checkboxes;
@@ -30,7 +31,10 @@ use craft\fields\PlainText;
 use craft\fields\RadioButtons;
 use craft\fields\Tags;
 use craft\fields\Users;
-
+use craft\helpers\Db;
+use craft\helpers\Json;
+use craft\helpers\StringHelper;
+use craft\models\FieldLayout;
 use craft\records\EntryType;
 
 /**
@@ -54,38 +58,153 @@ class ReasonsService extends Component
     // =========================================================================
 
     /**
-     * @param int $fieldLayoutId
-     * @param $conditionals
+     * Saves a field layout's conditionals, via the Project Config
+     *
+     * @param FieldLayout $layout
+     * @param string|array $conditionals
      * @return bool
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
+     * @throws \yii\base\NotSupportedException
+     * @throws \yii\web\ServerErrorHttpException
      */
-    public function saveFieldLayoutConditionals(int $fieldLayoutId, $conditionals): bool
+    public function saveFieldLayoutConditionals(FieldLayout $layout, $conditionals): bool
     {
-        $record = Conditionals::findOne([
-            'fieldLayoutId' => $fieldLayoutId,
-        ]);
-        if (!$record) {
-            $record = new Conditionals();
+
+        $uid = (new Query())
+            ->select(['uid'])
+            ->from('{{%reasons}}')
+            ->where(['fieldLayoutId' => $layout->id])
+            ->scalar();
+
+        $isNew = !$uid;
+        if ($isNew) {
+            $uid = StringHelper::UUID();
         }
-        $record->fieldLayoutId = $fieldLayoutId;
-        $record->conditionals = $conditionals;
-        return $record->save();
+
+        $conditionals = $this->prepConditionalsForProjectConfig($conditionals);
+
+        // Save it to the project config
+        $path = "reasons_conditionals.{$uid}";
+        Craft::$app->projectConfig->set($path, [
+            'fieldLayoutUid' => $layout->uid,
+            'conditionals' => $conditionals,
+        ]);
+
+        return true;
     }
 
     /**
-     * @param int $fieldLayoutId
+     * Deletes a field layout's conditionals, via the Project Config
+     *
+     * @param FieldLayout $layout
      * @return bool
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
      */
-    public function deleteFieldLayoutConditionals(int $fieldLayoutId): bool
+    public function deleteFieldLayoutConditionals(FieldLayout $layout): bool
     {
-        $record = Conditionals::findOne([
-            'fieldLayoutId' => $fieldLayoutId,
-        ]);
-        if (!$record) {
+
+        $uid = (new Query())
+            ->select(['uid'])
+            ->from('{{%reasons}}')
+            ->where(['fieldLayoutId' => $layout->id])
+            ->scalar();
+
+        if (!$uid) {
             return false;
         }
-        return $record->delete();
+
+        // Remove it from the project config
+        $path = "reasons_conditionals.{$uid}";
+        Craft::$app->projectConfig->remove($path);
+
+        return true;
+    }
+
+    /**
+     * @param ConfigEvent $event
+     * @throws \yii\db\Exception
+     */
+    public function onProjectConfigChange(ConfigEvent $event)
+    {
+
+        $uid = $event->tokenMatches[0];
+
+        $id = (new Query())
+            ->select(['id'])
+            ->from('{{%reasons}}')
+            ->where(['uid' => $uid])
+            ->scalar();
+
+        $isNew = empty($id);
+
+        if ($isNew) {
+            $fieldLayoutId = (int)Db::idByUid('{{%fieldlayouts}}', $event->newValue['fieldLayoutUid']);
+            Craft::$app->db->createCommand()
+                ->insert('{{%reasons}}', [
+                    'fieldLayoutId' => $fieldLayoutId,
+                    'conditionals' => $event->newValue['conditionals'],
+                    'uid' => $uid,
+                ])
+                ->execute();
+        } else {
+            Craft::$app->db->createCommand()
+                ->update('{{%reasons}}', [
+                    'conditionals' => $event->newValue['conditionals'],
+                ], ['id' => $id])
+                ->execute();
+        }
+
+        $this->clearCache();
+
+    }
+
+    /**
+     * @param ConfigEvent $event
+     * @throws \yii\db\Exception
+     */
+    public function onProjectConfigDelete(ConfigEvent $event)
+    {
+
+        $uid = $event->tokenMatches[0];
+
+        $id = (new Query())
+            ->select(['id'])
+            ->from('{{%reasons}}')
+            ->where(['uid' => $uid])
+            ->scalar();
+
+        if (!$id) {
+            return;
+        }
+
+        Craft::$app->db->createCommand()
+            ->delete('{{%reasons}}', ['id' => $id])
+            ->execute();
+
+        $this->clearCache();
+
+    }
+
+    /**
+     * @param RebuildConfigEvent $event
+     * @return void
+     */
+    public function onProjectConfigRebuild(RebuildConfigEvent $event)
+    {
+        $rows = (new Query())
+            ->select(['reasons.uid', 'reasons.conditionals', 'fieldlayouts.uid AS fieldLayoutUid'])
+            ->from('{{%reasons}} AS reasons')
+            ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = reasons.fieldLayoutId')
+            ->all();
+
+        foreach ($rows as $row) {
+            $uid = $row['uid'];
+            $path = "reasons_conditionals.{$uid}";
+            $event->config[$path]['conditionals'] = $row['conditionals'];
+            $event->config[$path]['fieldLayoutUid'] = $row['fieldLayoutUid'];
+        }
+
+        $this->clearCache();
     }
 
     /**
@@ -125,31 +244,93 @@ class ReasonsService extends Component
     }
 
     /**
+     * @param string|array $conditionals
+     * @return string|null
+     */
+    protected function prepConditionalsForProjectConfig($conditionals)
+    {
+        if (!$conditionals) {
+            return null;
+        }
+        $return = [];
+        $conditionals = Json::decodeIfJson($conditionals);
+        foreach ($conditionals as $targetFieldId => $statements) {
+            $targetFieldUid = Db::uidById('{{%fields}}', $targetFieldId);
+            $return[$targetFieldUid] = \array_map(function (array $rules) {
+                return \array_map(function (array $rule) {
+                    return [
+                        'field' => Db::uidById('{{%fields}}', $rule['fieldId']),
+                        'compare' => $rule['compare'],
+                        'value' => $rule['value'],
+                    ];
+                }, $rules);
+            }, $statements);
+        }
+        return Json::encode($return);
+    }
+
+    /**
+     * @param string|array $conditionals
+     * @return array|null
+     */
+    protected function normalizeConditionalsFromProjectConfig($conditionals)
+    {
+        if (!$conditionals) {
+            return null;
+        }
+        $return = [];
+        $conditionals = Json::decodeIfJson($conditionals);
+        foreach ($conditionals as $targetFieldUid => $statements) {
+            $targetFieldId = Db::idByUid('{{%fields}}', $targetFieldUid);
+            $return[$targetFieldId] = \array_map(function (array $rules) {
+                return \array_map(function (array $rule) {
+                    return [
+                        'fieldId' => Db::idByUid('{{%fields}}', $rule['field']),
+                        'compare' => $rule['compare'],
+                        'value' => $rule['value'],
+                    ];
+                }, $rules);
+            }, $statements);
+        }
+        return $return;
+    }
+
+    /**
+     * Returns all conditionals, mapped by source key
+     *
      * @return array
      */
     protected function getConditionals(): array
     {
 
-        $return = [];
-        $sources = $this->getSources();
+        // Get all conditionals from database
+        $rows = (new Query())
+            ->select(['reasons.id', 'reasons.fieldLayoutId', 'reasons.conditionals'])
+            ->from('{{%reasons}} AS reasons')
+            ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = fieldLayoutId')
+            ->all();
 
-        // Get all conditionals, map them to field layout IDs
+        if (!$rows) {
+            return [];
+        }
+
+        // Map conditionals to field layouts, and convert field uids to ids
         $conditionals = [];
-        $conditionalsRecords = Conditionals::find()->all();
-        /** @var Conditionals $conditionalsRecord */
-        foreach ($conditionalsRecords as $conditionalsRecord) {
-            $conditionals["fieldLayout:{$conditionalsRecord->fieldLayoutId}"] = $conditionalsRecord->conditionals;
+        foreach ($rows as $row) {
+            $conditionals["fieldLayout:{$row['fieldLayoutId']}"] = $this->normalizeConditionalsFromProjectConfig($row['conditionals']);
         }
 
         // Map conditionals to sources
+        $conditionalsBySources = [];
+        $sources = $this->getSources();
         foreach ($sources as $sourceId => $fieldLayoutId) {
             if (!isset($conditionals["fieldLayout:{$fieldLayoutId}"])) {
                 continue;
             }
-            $return[$sourceId] = $conditionals["fieldLayout:{$fieldLayoutId}"];
+            $conditionalsBySources[$sourceId] = $conditionals["fieldLayout:{$fieldLayoutId}"];
         }
 
-        return $return;
+        return $conditionalsBySources;
     }
 
     /**
@@ -234,8 +415,6 @@ class ReasonsService extends Component
      */
     protected function getToggleFieldTypes(): array
     {
-        // TODO PositionSelect (now a plugin)
-        // TODO Third party field types
         return [
             Lightswitch::class,
             Dropdown::class,
@@ -283,6 +462,11 @@ class ReasonsService extends Component
      */
     protected function getCacheKey(): string
     {
-        return Reasons::getInstance()->getHandle() . '-' . Reasons::getInstance()->getVersion() . '-' . Reasons::getInstance()->schemaVersion;
+        $reasons = Reasons::getInstance();
+        return \implode('-', [
+            $reasons->getHandle(),
+            $reasons->getVersion(),
+            $reasons->schemaVersion
+        ]);
     }
 }

@@ -10,6 +10,7 @@
 
 namespace mmikkel\reasons;
 
+use craft\services\ProjectConfig;
 use mmikkel\reasons\assetbundles\reasons\ReasonsAssetBundle;
 use mmikkel\reasons\services\ReasonsService;
 
@@ -21,7 +22,7 @@ use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\elements\Tag;
 use craft\elements\User;
-use craft\events\FieldEvent;
+use craft\events\ConfigEvent;
 use craft\events\FieldLayoutEvent;
 use craft\events\PluginEvent;
 use craft\events\TemplateEvent;
@@ -56,7 +57,7 @@ class Reasons extends Plugin
     /**
      * @var string
      */
-    public $schemaVersion = '2.0.0';
+    public $schemaVersion = '2.1.0';
 
     /**
      * @var bool
@@ -79,21 +80,93 @@ class Reasons extends Plugin
         parent::init();
         self::$plugin = $this;
 
+        $this->setComponents([
+            'reasons' => ReasonsService::class,
+        ]);
+
         Event::on(
             Plugins::class,
             Plugins::EVENT_AFTER_INSTALL_PLUGIN,
             function (PluginEvent $event) {
                 if ($event->plugin === $this) {
+                    $this->reasons->clearCache();
                 }
             }
         );
 
         Event::on(
             Plugins::class,
-            Plugins::EVENT_AFTER_LOAD_PLUGINS,
-            function () {
-                $this->yolo();
+            Plugins::EVENT_AFTER_UNINSTALL_PLUGIN,
+            function (PluginEvent $event) {
+                if ($event->plugin === $this) {
+                    $this->reasons->clearCache();
+                }
             }
+        );
+
+        // Save or delete conditionals when field layout is saved
+        Event::on(
+            Fields::class,
+            Fields::EVENT_AFTER_SAVE_FIELD_LAYOUT,
+            function (FieldLayoutEvent $event) {
+                $conditionals = Craft::$app->getRequest()->getBodyParam('_reasons', null);
+                if ($conditionals === null) {
+                    return;
+                }
+                try {
+                    if ($conditionals) {
+                        Reasons::getInstance()->reasons->saveFieldLayoutConditionals($event->layout, $conditionals);
+                    } else {
+                        Reasons::getInstance()->reasons->deleteFieldLayoutConditionals($event->layout);
+                    }
+                } catch (\Throwable $e) {
+                    Craft::error($e->getMessage(), __METHOD__);
+                    if (Craft::$app->getConfig()->getGeneral()->devMode) {
+                        throw $e;
+                    }
+                }
+            }
+        );
+
+        // Clear data caches when field layouts are deleted
+        Event::on(
+            Fields::class,
+            Fields::EVENT_AFTER_DELETE_FIELD_LAYOUT,
+            [$this->reasons, 'clearCache']
+        );
+
+        // Clear data caches when fields are saved
+        Event::on(
+            Fields::class,
+            Fields::EVENT_AFTER_SAVE_FIELD,
+            [$this->reasons, 'clearCache']
+        );
+
+        // Clear data caches when fields are deleted
+        Event::on(
+            Fields::class,
+            Fields::EVENT_AFTER_DELETE_FIELD,
+            [$this->reasons, 'clearCache']
+        );
+
+        // Support Project Config rebuild
+        Event::on(
+            ProjectConfig::class,
+            ProjectConfig::EVENT_REBUILD,
+            [$this->reasons, 'onProjectConfigRebuild']
+        );
+
+        // Listen for appropriate Project Config changes
+        Craft::$app->projectConfig
+            ->onAdd('reasons_conditionals.{uid}', [$this->reasons, 'onProjectConfigChange'])
+            ->onUpdate('reasons_conditionals.{uid}', [$this->reasons, 'onProjectConfigChange'])
+            ->onRemove('reasons_conditionals.{uid}', [$this->reasons, 'onProjectConfigDelete']);
+
+        // Queue up asset bundle or handle AJAX action requests
+        Event::on(
+            Plugins::class,
+            Plugins::EVENT_AFTER_LOAD_PLUGINS,
+            [$this, 'initReasons']
         );
 
         Craft::info(
@@ -106,9 +179,10 @@ class Reasons extends Plugin
         );
     }
 
-    // Protected Methods
-    // =========================================================================
-    protected function yolo()
+    /**
+     * @return void
+     */
+    public function initReasons()
     {
 
         $request = Craft::$app->getRequest();
@@ -118,16 +192,23 @@ class Reasons extends Plugin
             return;
         }
 
-        // Register services
-        $this->setComponents([
-            'reasons' => ReasonsService::class,
-        ]);
-
-        if ($request->getIsAjax() || $request->getAcceptsJson()) {
+        $isAjax = $request->getIsAjax() || $request->getAcceptsJson();
+        if ($isAjax) {
             $this->initAjaxRequest();
-            return;
+        } else {
+            $this->registerAssetBundle();
         }
-        
+
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @return void
+     */
+    protected function registerAssetBundle()
+    {
         // Register asset bundle
         Event::on(
             View::class,
@@ -143,56 +224,6 @@ class Reasons extends Plugin
                 }
             }
         );
-
-        // Save conditionals when field layout is saved
-        Event::on(
-            Fields::class,
-            Fields::EVENT_AFTER_SAVE_FIELD_LAYOUT,
-            function (FieldLayoutEvent $event) {
-                $conditionals = Craft::$app->getRequest()->getBodyParam('_reasons', null);
-                if ($conditionals !== null && $fieldLayout = $event->layout) {
-                    try {
-                        if ($conditionals) {
-                            Reasons::getInstance()->reasons->saveFieldLayoutConditionals((int)$fieldLayout->id, $conditionals);
-                        } else {
-                            Reasons::getInstance()->reasons->deleteFieldLayoutConditionals((int)$fieldLayout->id);
-                        }
-                    } catch (\Throwable $e) {
-                        Craft::error($e->getMessage(), __METHOD__);
-                        if (Craft::$app->getConfig()->getGeneral()->devMode) {
-                            throw $e;
-                        }
-                    }
-                }
-                Reasons::getInstance()->reasons->clearCache();
-            }
-        );
-
-        Event::on(
-            Fields::class,
-            Fields::EVENT_AFTER_DELETE_FIELD_LAYOUT,
-            function (FieldLayoutEvent $event) {
-                Reasons::getInstance()->reasons->clearCache();
-            }
-        );
-
-        Event::on(
-            Fields::class,
-            Fields::EVENT_AFTER_SAVE_FIELD,
-            function (FieldEvent $event) {
-                Reasons::getInstance()->reasons->clearCache();
-            }
-        );
-
-        Event::on(
-            Fields::class,
-            Fields::EVENT_AFTER_DELETE_FIELD,
-            function (FieldEvent $event) {
-                Reasons::getInstance()->reasons->clearCache();
-            }
-        );
-
-
     }
 
     /**

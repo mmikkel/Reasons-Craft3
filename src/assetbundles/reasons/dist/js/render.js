@@ -22,7 +22,7 @@
             this.$el.attr('id', this.id);
         }
 
-        this.conditionals = JSON.parse(conditionals || null);
+        this.conditionals = conditionals;
 
         this.init = function () {
             this.addEventListeners();

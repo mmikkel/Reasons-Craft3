@@ -14,7 +14,7 @@
 
         this.$el = $el;
 
-        this.conditionals = JSON.parse(conditionals || null);
+        this.conditionals = conditionals;
 
         this.settings = {
             formSelector: 'form:first',
