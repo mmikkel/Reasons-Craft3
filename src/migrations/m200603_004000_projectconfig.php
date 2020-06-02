@@ -71,7 +71,7 @@ class m200603_004000_projectconfig extends Migration
             }
             $return[$targetFieldUid] = \array_map(function (array $rules) {
                 return \array_map(function (array $rule) {
-                    $fieldIdOrUid = $rule['fieldId'];
+                    $fieldIdOrUid = $rule['fieldId'] ?? $rule['field'];
                     if (!StringHelper::isUUID($fieldIdOrUid)) {
                         $fieldUid = Db::uidById('{{%fields}}', $fieldIdOrUid);
                     } else {
