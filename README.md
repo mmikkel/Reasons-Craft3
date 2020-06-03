@@ -15,6 +15,16 @@ Reasons adds simple conditionals to field layouts in Craft CMS – making it pos
 * Supports [Project Config](https://docs.craftcms.com/v3/project-config.html)
 * Third-party fieldtypes or plugins (including Craft Commerce) are *not* supported  
 
+## Reasons for Craft 3?! But they said it'd never happen!
+
+Yeah, [I wasn't gonna do this](https://github.com/mmikkel/Reasons-Craft/wiki/Statement-on-Reasons-2,-Matrix-and-Craft-3). 
+
+Field layout conditionals were originally planned for core in a 3.x release. Currently, the feature is [on the roadmap for Craft 4.0](https://github.com/craftcms/cms/issues/805) - which may or may not release sometime in 2021. I figured, 3 years is a long enough wait (almost 5 years, if you count the original feature request!) - so I decided to spend a couple of afternoons to finally port Reasons over.   
+
+But, don't get too excited! This plugin is exactly the same as the Craft 2 version, and oft-requested features like Matrix support are still not happening. I'll do my best to make sure it works with upcoming Craft 3.x releases, but I'm not going to spend any additional time on it beyond that.  
+
+_The primary purpose of this port is to make it easier to upgrade existing Craft 2 sites using Reasons, to Craft 3._ In fact, I'd discourage using this plugin for _new_ projects. Conditionals are neat, but in the long run you'll probably be happier without it until the core feature is available. If you do decide to use Reasons, consider it on life support and as a stop-gap solution until Craft has conditionals in core.   
+
 ## Requirements
 
 **This plugin requires Craft CMS 3.4.22.1 or later.**
@@ -37,17 +47,7 @@ To install the plugin, follow these instructions.
 
 ## Updating from Craft 2
 
-Existing conditionals in the database from the Craft 2 version should be migrated over automatically and continue to work as-is. Note that all third-party fieldtype and plugin support (including Solspace Calendar and Craft Commerce) has been removed, though.    
-
-## Reasons for Craft 3?! But they said it'd never happen!
-
-Yeah, [I wasn't gonna do this](https://github.com/mmikkel/Reasons-Craft/wiki/Statement-on-Reasons-2,-Matrix-and-Craft-3). 
-
-Field layout conditionals were originally planned for core in a 3.x release. Currently, the feature is [on the roadmap for Craft 4.0](https://github.com/craftcms/cms/issues/805) - which may or may not release sometime in 2021. I figured, 3 years is a long enough wait (almost 5 years, if you count the original feature request!) - so I decided to spend a couple of afternoons to finally port Reasons over.   
-
-But, don't get too excited! This plugin is exactly the same as the Craft 2 version, and oft-requested features like Matrix support are still not happening. I'll do my best to make sure it works with upcoming Craft 3.x releases, but I'm not going to spend any additional time on it beyond that.  
-
-_The primary purpose of this port is to make it easier to upgrade existing Craft 2 sites using Reasons, to Craft 3._ In fact, I'd discourage using this plugin for _new_ projects. Conditionals are neat, but in the long run you'll probably be happier without it until the core feature is available. If you do decide to use Reasons, consider it on life support and as a stop-gap solution until Craft has conditionals in core.   
+Existing conditionals in the database from the Craft 2 version should be migrated over automatically and continue to work as-is. Note that all third-party fieldtype and plugin support (including Solspace Calendar and Craft Commerce) has been removed, though.  
 
 ## Using Reasons
 
