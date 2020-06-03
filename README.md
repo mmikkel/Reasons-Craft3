@@ -1,4 +1,6 @@
-# Reasons plugin for Craft CMS 3.x
+# Reasons plugin for Craft CMS 3.x  
+
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mmikkel/Reasons-Craft3/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mmikkel/Reasons-Craft3/?branch=master)
 
 _Supercharge your field layouts with conditionals._  
 
