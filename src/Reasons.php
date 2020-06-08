@@ -109,6 +109,9 @@ class Reasons extends Plugin
             Fields::class,
             Fields::EVENT_AFTER_SAVE_FIELD_LAYOUT,
             function (FieldLayoutEvent $event) {
+                if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+                    return;
+                }
                 $conditionals = Craft::$app->getRequest()->getBodyParam('_reasons', null);
                 if ($conditionals === null) {
                     return;
@@ -188,7 +191,7 @@ class Reasons extends Plugin
         $request = Craft::$app->getRequest();
         $user = Craft::$app->getUser()->getIdentity();
 
-        if (!$request->getIsCpRequest() || $request->getIsSiteRequest() || $request->getIsConsoleRequest() || !$user || !$user->can('accessCp')) {
+        if ($request->getIsConsoleRequest() || !$request->getIsCpRequest() || $request->getIsSiteRequest() || !$user || !$user->can('accessCp')) {
             return;
         }
 
