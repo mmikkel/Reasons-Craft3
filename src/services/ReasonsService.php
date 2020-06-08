@@ -279,18 +279,22 @@ class ReasonsService extends Component
             return null;
         }
         $return = [];
-        $conditionals = Json::decodeIfJson($conditionals);
-        foreach ($conditionals as $targetFieldUid => $statements) {
-            $targetFieldId = Db::idByUid('{{%fields}}', $targetFieldUid);
-            $return[$targetFieldId] = \array_map(function (array $rules) {
-                return \array_map(function (array $rule) {
-                    return [
-                        'fieldId' => Db::idByUid('{{%fields}}', $rule['field']),
-                        'compare' => $rule['compare'],
-                        'value' => $rule['value'],
-                    ];
-                }, $rules);
-            }, $statements);
+        try {
+            $conditionals = Json::decodeIfJson($conditionals);
+            foreach ($conditionals as $targetFieldUid => $statements) {
+                $targetFieldId = Db::idByUid('{{%fields}}', $targetFieldUid);
+                $return[$targetFieldId] = \array_map(function (array $rules) {
+                    return \array_map(function (array $rule) {
+                        return [
+                            'fieldId' => Db::idByUid('{{%fields}}', $rule['field']),
+                            'compare' => $rule['compare'],
+                            'value' => $rule['value'],
+                        ];
+                    }, $rules);
+                }, $statements);
+            }
+        } catch (\Throwable $e) {
+            Craft::error($e->getMessage(), __METHOD__);
         }
         return $return;
     }
