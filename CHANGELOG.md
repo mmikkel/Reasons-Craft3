@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.1.1 - 2020-06-08
+### Fixed
+- Fixes an issue where Reasons could throw an exception when syncing project config via console
+- Fixes an issue where conditionals could be truncated on field layout save
+- Fixes an issue where multiple toggle fields per target field wouldn't work as expected
+
 ## 2.1.0 - 2020-06-01
 ### Added
 - Adds support for Project Config
