@@ -81,7 +81,7 @@ class Install extends Migration
                 [
                     'id' => $this->primaryKey(),
                     'fieldLayoutId' => $this->integer()->notNull(),
-                    'conditionals' => $this->string(255),
+                    'conditionals' => $this->text(),
                     'dateCreated' => $this->dateTime()->notNull(),
                     'dateUpdated' => $this->dateTime()->notNull(),
                     'uid' => $this->uid(),

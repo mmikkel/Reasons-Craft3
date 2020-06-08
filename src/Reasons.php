@@ -57,7 +57,7 @@ class Reasons extends Plugin
     /**
      * @var string
      */
-    public $schemaVersion = '2.1.0';
+    public $schemaVersion = '2.1.1';
 
     /**
      * @var bool
