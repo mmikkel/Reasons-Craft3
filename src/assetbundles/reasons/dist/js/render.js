@@ -34,8 +34,8 @@
         this.addEventListeners = function () {
 
             Garnish.$doc
-                .on('click', this.settings.fieldsSelector + '[data-toggle="1"]', this.onInputWrapperClick.bind(this))
-                .on('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input, ' + this.settings.fieldsSelector + '[data-toggle="1"] ' + this.settings.lightswitchContainerSelector, this.onFieldInputChange.bind(this))
+                .on('click', this.settings.fieldsSelector + '[data-reasons-toggle="1"]', this.onInputWrapperClick.bind(this))
+                .on('change keyup', this.settings.fieldsSelector + '[data-reasons-toggle="1"] *:input, ' + this.settings.fieldsSelector + '[data-reasons-toggle="1"] ' + this.settings.lightswitchContainerSelector, this.onFieldInputChange.bind(this))
                 .on('click', 'a[data-buttonbox-value]', this.onFieldInputChange.bind(this));
 
             // Init element selects
@@ -69,8 +69,8 @@
         this.removeEventListeners = function () {
 
             Garnish.$doc
-                .off('click', this.settings.fieldsSelector + '[data-toggle="1"]', this.onInputWrapperClick.bind(this))
-                .off('change keyup', this.settings.fieldsSelector + '[data-toggle="1"] *:input, ' + this.settings.fieldsSelector + '[data-toggle="1"] ' + this.settings.lightswitchContainerSelector, this.onFieldInputChange.bind(this))
+                .off('click', this.settings.fieldsSelector + '[data-reasons-toggle="1"]', this.onInputWrapperClick.bind(this))
+                .off('change keyup', this.settings.fieldsSelector + '[data-reasons-toggle="1"] *:input, ' + this.settings.fieldsSelector + '[data-reasons-toggle="1"] ' + this.settings.lightswitchContainerSelector, this.onFieldInputChange.bind(this))
                 .off('click', 'a[data-buttonbox-value]', this.onFieldInputChange.bind(this));
 
             var self = this,
@@ -185,12 +185,20 @@
             // Get toggle field IDs
             var fieldIds = Object.keys(this.conditionals);
             var toggleFieldIds = [];
+            var toggleFieldId;
+            var statementsArray;
             var statements;
 
             for (var i = 0; i < fieldIds.length; ++i) {
-                statements = this.conditionals[fieldIds[i]][0];
-                for (var j = 0; j < statements.length; ++j) {
-                    toggleFieldIds.push(statements[j].fieldId);
+                statementsArray = this.conditionals[fieldIds[i]] || [];
+                for (var j = 0; j < statementsArray.length; ++j) {
+                    statements = statementsArray[j];
+                    for (var k = 0; k < statements.length; ++k) {
+                        toggleFieldId = statements[k]['fieldId'] || null;
+                        if (toggleFieldId && toggleFieldIds.indexOf(toggleFieldId) === -1) {
+                            toggleFieldIds.push(toggleFieldId);
+                        }
+                    }
                 }
             }
 
@@ -210,24 +218,30 @@
                 // Get field handle
                 fieldHandlePath = $field.attr('id').split('-');
 
-                if (fieldHandlePath.length < 3 || fieldHandlePath.length > 4) return; // Only basic fields for now!
-                fieldHandle = fieldHandlePath.slice(-2, -1)[0] || false;
+                if (fieldHandlePath.length < 3 || fieldHandlePath.length > 4) {
+                    return; // Only basic fields for now!
+                }
 
-                if (!fieldHandle) return;
+                fieldHandle = fieldHandlePath.slice(-2, -1)[0] || false;
+                if (!fieldHandle) {
+                    return;
+                }
+
                 fieldId = Craft.ReasonsPlugin.getFieldIdByHandle(fieldHandle);
 
-                if (fieldId) {
+                if (fieldId && !$field.attr('data-id')) {
                     $field.attr('data-id', fieldId);
                 }
 
                 // Is this a target field?
                 if (self.conditionals[fieldId]) {
-                    $field.attr('data-target', 1);
+                    $field.attr('data-reasons-target', 1);
                 }
 
                 // Is this a toggle field
-                if (toggleFieldIds.indexOf(parseInt(fieldId)) > -1) {
-                    $field.attr('data-toggle', 1);
+                var isToggleField = toggleFieldIds.indexOf(parseInt(fieldId)) > -1;
+                if (isToggleField) {
+                    $field.attr('data-reasons-toggle', 1);
                 }
 
             });
@@ -239,7 +253,7 @@
         this.evaluateConditionals = function () {
 
             var self = this,
-                $targetFields = $(this.getFieldsSelector() + '[data-target="1"]'),
+                $targetFields = $(this.getFieldsSelector() + '[data-reasons-target="1"]'),
                 $targetField,
                 statements,
                 statementValid,
@@ -257,6 +271,7 @@
                 .each(function () {
 
                     $targetField = $(this);
+
                     statements = self.conditionals[$targetField.data('id')] || false;
 
                     if (!statements) {
