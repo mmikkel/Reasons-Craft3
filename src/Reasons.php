@@ -287,7 +287,7 @@ class Reasons extends Plugin
                     break;
 
                 case Tag::class:
-                    $conditionalsKey = "tagGroup:{$element->tagId}";
+                    $conditionalsKey = "tagGroup:{$element->groupId}";
                     break;
 
                 case User::class:

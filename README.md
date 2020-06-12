@@ -80,7 +80,7 @@ These field types can be used as toggle fields:
 
 ### Where does it work?
 
-Reasons works for Entries, Global Sets, Categories, Assets and Users. It also works inside Live Preview, in element editor modals and for entry drafts and revisions.  
+Reasons works for Entries, Global Sets, Categories, Assets, Users and Tags. It also works inside Live Preview, in element editor modals and for entry drafts and revisions.  
 
 ### A note on required fields
 
@@ -88,7 +88,7 @@ Be careful not to add conditionals to a required field. Even if the required fie
 
 ### What Reasons doesn't do - or a disclaimer of sorts
 
-It's important to realize that Reasons is strictly about increasing authoring experienc, by hiding the UI for fields that might be irrelevant based on other fields' current values.  
+It's important to realize that Reasons is strictly about increasing authoring experience, by hiding the UI for fields that might be irrelevant based on other fields' current values.  
  
 Reasons works as a thin layer on top of Craft's Control Panel UI, using JavaScript to show and hide fields as content is being edited. Since the plugin is dependant on undocumented features, markup, CSS and JavaScript in the Control Panel, it's basically a big hack and may stop working at any time if certain aspects of the Control Panel is ever changed or redesigned.  
 

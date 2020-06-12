@@ -26,6 +26,8 @@
         ENTRY_TYPE_ACTION: 'sections/save-entry-type',
         USERS_ACTION: 'users/save-user',
         USERS_FIELDS_ACTION: 'users/save-field-layout',
+        TAG_ACTION: 'tags/save-tag',
+        TAG_GROUP_ACTION: 'tags/save-tag-group',
         FIELDS_ACTION: 'fields/save-field',
 
         RENDER_CONTEXT: 'render',
@@ -122,6 +124,7 @@
             }
 
             var formData = this.getElementSourceFromForm($form);
+
             if (!formData) {
                 return null;
             }
@@ -241,6 +244,12 @@
                     type = this.USERS_HANDLE;
                     break;
 
+                case this.TAG_ACTION :
+                case this.TAG_GROUP_ACTION :
+                    type = this.TAG_GROUP_HANDLE;
+                    idInputSelector = 'input[type="hidden"][name="tagGroupId"]';
+                    break;
+
             }
 
             if (!type) {
@@ -274,6 +283,7 @@
                 case this.ENTRY_REVISION_ACTION :
                 case this.CATEGORY_ACTION :
                 case this.USERS_ACTION :
+                case this.TAG_ACTION :
                     return this.RENDER_CONTEXT;
 
                 case this.ASSET_SOURCE_ACTION :
@@ -281,6 +291,7 @@
                 case this.GLOBAL_SET_ACTION :
                 case this.ENTRY_TYPE_ACTION :
                 case this.USERS_FIELDS_ACTION :
+                case this.TAG_GROUP_ACTION :
                     return this.LAYOUT_DESIGNER_CONTEXT;
 
             }

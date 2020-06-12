@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.1.2 - 2020-06-12
+### Added
+- Adds support for Tags
+### Fixed
+- Fixes an issue where Reasons could break element editor modals for Tags
+
 ## 2.1.1 - 2020-06-08
 ### Fixed
 - Fixes an issue where Reasons could throw an exception when syncing project config via console
