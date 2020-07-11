@@ -65,13 +65,13 @@
             }, this));
 
             this.$el.on('mousedown', this.settings.fieldSelector, $.proxy(this.onFieldMouseDown, this));
-            Garnish.$doc.on('click', '.menu a', $.proxy(this.onFieldSettingsMenuItemClick, this));
 
+            // Listen for field settings HUD creations
+            Garnish.on(Craft.FieldLayoutDesigner.Element, 'createSettingsHud', this.onElementSettingsHudCreation.bind(this));
         }
 
         this.destroy = function() {
             this.$el.off('mousedown', this.settings.fieldSelector, $.proxy(this.onFieldMouseDown, this));
-            Garnish.$doc.on('click', '.menu a', $.proxy(this.onFieldSettingsMenuItemClick, this));
         }
 
         this.refresh = function() {
@@ -135,31 +135,6 @@
                         $field.removeClass('reasonsHasConditionals');
                     }
 
-                    if (!$field.data('_reasonsSettingsMenuItemInitialized')) {
-
-                        // Create settings menu item
-                        var $button = $field.find(self.settings.fieldSettingsSelector),
-                            menubtn = $button.data('menubtn') || false;
-
-                        if (!menubtn) {
-                            return;
-                        }
-
-                        var $menu = menubtn.menu.$container;
-                        $menu
-                            .find('ul')
-                            .children(':first')
-                            .clone(true)
-                            .insertBefore($menu.find('ul:first li:last'))
-                            .find('a:first')
-                            .data('_reasonsField', $field)
-                            .attr('data-action', 'toggle-conditionals')
-                            .text(Craft.t('reasons', 'Edit conditionals'));
-
-                        $field.data('_reasonsSettingsMenuItemInitialized', true);
-
-                    }
-
                 });
 
             });
@@ -187,57 +162,66 @@
             $('body').on('mouseup', mouseUpHandler);
         }
 
-        this.onFieldSettingsMenuItemClick = function(e) {
+        this.onElementSettingsHudCreation = function(e) {
+            /** @type {Craft.FieldLayoutDesigner.Element} */
+            let element = e.target;
 
-            var $trigger = $(e.target),
-                $field = $trigger.data('_reasonsField');
+            // Ignore if this isn't a custom field
+            if (element.config.type !== 'craft\\fieldlayoutelements\\CustomField') {
+                return;
+            }
 
-            if ($trigger.data('action') === 'toggle-conditionals') {
+            let $btn = $('<div class="btn"></div>')
+                .text(Craft.t('reasons', 'Edit conditionals'))
+                .on('click', {
+                    element: element,
+                }, this.showModal.bind(this));
 
-                e.preventDefault();
-                e.stopPropagation();
+            element.hud.$footer.append(
+                $('<div class="buttons left"></div>')
+                    .append($btn)
+            );
+        };
 
-                if (!$trigger.data('_reasonsModal')) {
+        this.showModal = function(e) {
+            /** @type {Craft.FieldLayoutDesigner.Element} */
+            let element = e.data.element;
+            let $field = element.$container;
 
-                    // Create modal
-                    var self = this,
-                        builder = $field.data('_reasonsBuilder'),
-                        $modal = $(this.templates.modal()),
-                        modal = new Garnish.Modal($modal, {
-                            resizable: true,
-                            autoShow: false,
-                            onShow: function () {
-                                Garnish.requestAnimationFrame(function () {
-                                    self.refresh();
-                                });
-                            },
-                            onHide: function () {
-                                Garnish.requestAnimationFrame(function () {
-                                    self.refresh();
-                                });
-                            }
-                        });
+            if (!$field.data('_reasonsModal')) {
 
-                    // Add builder to modal
-                    builder.get().appendTo($modal.find('.body'));
-
-                    $modal.on('click', '.close', function (e) {
-                        modal.hide();
+                // Create modal
+                var self = this,
+                    builder = $field.data('_reasonsBuilder'),
+                    $modal = $(this.templates.modal()),
+                    modal = new Garnish.Modal($modal, {
+                        resizable: true,
+                        autoShow: false,
+                        onShow: function () {
+                            Garnish.requestAnimationFrame(function () {
+                                self.refresh();
+                            });
+                        },
+                        onHide: function () {
+                            Garnish.requestAnimationFrame(function () {
+                                self.refresh();
+                            });
+                        }
                     });
 
-                    $trigger.data('_reasonsModal', modal);
+                // Add builder to modal
+                builder.get().appendTo($modal.find('.body'));
 
-                }
+                $modal.on('click', '.close', function (e) {
+                    modal.hide();
+                });
 
-                $trigger.data('_reasonsModal').show();
+                $field.data('_reasonsModal', modal);
 
             }
 
-            Garnish.requestAnimationFrame($.proxy(function () {
-                this.refresh();
-            }, this));
-
-        }
+            $field.data('_reasonsModal').show();
+        };
 
         this.onFormSubmit = function() {
             this.refresh();

@@ -12,7 +12,7 @@ Reasons adds simple conditionals to field layouts in Craft CMS – making it pos
 
 ### Changes from the Craft 2 version:  
 
-* Works with Craft 3.4+
+* Works with Craft 3
 * Works with the new Drafts and Live Preview systems, and the new Asset edit pages in Craft 3.4  
 * Supports [Project Config](https://docs.craftcms.com/v3/project-config.html)
 * Third-party fieldtypes or plugins (including Craft Commerce) are *not* supported  
@@ -29,7 +29,7 @@ _The primary purpose of this port is to make it easier to upgrade existing Craft
 
 ## Requirements
 
-**This plugin requires Craft CMS 3.4.22.1 or later.**
+**This plugin requires Craft CMS 3.5.0-RC1 or later.**
 
 [Looking for the Craft 2 version?](https://github.com/mmikkel/Reasons-Craft)
 
