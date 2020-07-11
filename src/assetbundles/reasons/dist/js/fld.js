@@ -17,7 +17,6 @@
         this.conditionals = conditionals;
 
         this.settings = {
-            formSelector: 'form:first',
             fieldSettingsSelector: 'a.settings',
             fieldSelector: '.fld-field',
             tabSelector: '.fld-tabs .fld-tab'
