@@ -113,15 +113,19 @@ class Reasons extends Plugin
                 if (Craft::$app->getRequest()->getIsConsoleRequest()) {
                     return;
                 }
+                $fieldLayout = $event->layout;
+                if (!$fieldLayout) {
+                    return;
+                }
                 $conditionals = Craft::$app->getRequest()->getBodyParam('_reasons', null);
                 if ($conditionals === null) {
                     return;
                 }
                 try {
                     if ($conditionals) {
-                        $this->reasons->saveFieldLayoutConditionals($event->layout, $conditionals);
+                        $this->reasons->saveFieldLayoutConditionals($fieldLayout, $conditionals);
                     } else {
-                        $this->reasons->deleteFieldLayoutConditionals($event->layout);
+                        $this->reasons->deleteFieldLayoutConditionals($fieldLayout);
                     }
                 } catch (\Throwable $e) {
                     Craft::error($e->getMessage(), __METHOD__);
@@ -219,12 +223,12 @@ class Reasons extends Plugin
         Event::on(
             View::class,
             View::EVENT_BEFORE_RENDER_TEMPLATE,
-            function (TemplateEvent $event) {
+            function (/** @scrutinizer ignore-unused */ TemplateEvent $event) {
                 try {
                     Craft::$app->getView()->registerAssetBundle(ReasonsAssetBundle::class);
                 } catch (InvalidConfigException $e) {
                     Craft::error(
-                        'Error registering AssetBundle - '.$e->getMessage(),
+                        'Error registering AssetBundle - ' . $e->getMessage(),
                         __METHOD__
                     );
                 }

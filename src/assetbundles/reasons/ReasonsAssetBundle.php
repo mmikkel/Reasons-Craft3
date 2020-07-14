@@ -108,7 +108,7 @@ class ReasonsAssetBundle extends AssetBundle
                 $volumeHandle = $segments[1];
                 /** @var Volume $volume */
                 $volume = Craft::$app->getVolumes()->getVolumeByHandle($volumeHandle);
-                if ($volume) {
+                if ($volume !== null) {
                     $data['renderContext'] = "assetSource:{$volume->id}";
                 }
             }
