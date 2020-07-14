@@ -6,9 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## Unreleased
 ### Added
-- Adds Craft 3.5 compatibility  
+- Adds Craft 3.5 compatibility. Thanks @brandonkelly!  
 ### Changed
 - Reasons now requires Craft 3.5.0-RC1 or later
+### Fixed
+- Fixes an issue where conditionals could disappear from the Project Config when it was rebuilt
 
 ## 2.1.2 - 2020-06-12
 ### Added
