@@ -113,20 +113,6 @@ class Install extends Migration
      */
     protected function removeTables()
     {
-        $tableSchema = Craft::$app->db->schema->getTableSchema('{{%reasons}}');
-
-        if ($tableSchema !== null) {
-            // Remove all conditionals from the project config
-            $uids = (new Query())
-                ->select(['uid'])
-                ->from('{{%reasons}}')
-                ->column();
-            foreach ($uids as $uid) {
-                $path = "reasons_conditionals.{$uid}";
-                Craft::$app->projectConfig->remove($path);
-            }
-        }
-
         $this->dropTableIfExists('{{%reasons}}');
     }
 }
