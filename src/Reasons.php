@@ -10,7 +10,6 @@
 
 namespace mmikkel\reasons;
 
-use craft\services\ProjectConfig;
 use mmikkel\reasons\assetbundles\reasons\ReasonsAssetBundle;
 use mmikkel\reasons\services\ReasonsService;
 
@@ -28,6 +27,7 @@ use craft\events\PluginEvent;
 use craft\events\TemplateEvent;
 use craft\services\Fields;
 use craft\services\Plugins;
+use craft\services\ProjectConfig;
 use craft\web\View;
 
 use yii\base\Event;
