@@ -31,6 +31,7 @@ use craft\services\ProjectConfig;
 use craft\web\View;
 
 use yii\base\Event;
+use yii\base\InvalidConfigException;
 
 /**
  * Class Reasons
@@ -118,9 +119,9 @@ class Reasons extends Plugin
                 }
                 try {
                     if ($conditionals) {
-                        Reasons::getInstance()->reasons->saveFieldLayoutConditionals($event->layout, $conditionals);
+                        $this->reasons->saveFieldLayoutConditionals($event->layout, $conditionals);
                     } else {
-                        Reasons::getInstance()->reasons->deleteFieldLayoutConditionals($event->layout);
+                        $this->reasons->deleteFieldLayoutConditionals($event->layout);
                     }
                 } catch (\Throwable $e) {
                     Craft::error($e->getMessage(), __METHOD__);
@@ -189,6 +190,8 @@ class Reasons extends Plugin
     {
 
         $request = Craft::$app->getRequest();
+
+        /** @var User $user */
         $user = Craft::$app->getUser()->getIdentity();
 
         if ($request->getIsConsoleRequest() || !$request->getIsCpRequest() || $request->getIsSiteRequest() || !$user || !$user->can('accessCp')) {
@@ -261,8 +264,7 @@ class Reasons extends Plugin
             }
 
             $element = Craft::$app->getElements()->getElementById($elementId);
-
-            if (!$element) {
+            if ($element === null) {
                 return;
             }
 
@@ -271,22 +273,27 @@ class Reasons extends Plugin
 
             switch ($elementType) {
                 case Entry::class:
+                    /** @var Entry $element */
                     $conditionalsKey = "entryType:{$element->typeId}";
                     break;
 
                 case GlobalSet::class:
+                    /** @var GlobalSet $element */
                     $conditionalsKey = "globalSet:{$element->id}";
                     break;
 
                 case Asset::class:
+                    /** @var Asset $element */
                     $conditionalsKey = "assetSource:{$element->volumeId}";
                     break;
 
                 case Category::class:
+                    /** @var Category $element */
                     $conditionalsKey = "categoryGroup:{$element->groupId}";
                     break;
 
                 case Tag::class:
+                    /** @var Tag $element */
                     $conditionalsKey = "tagGroup:{$element->groupId}";
                     break;
 

@@ -12,6 +12,7 @@ namespace mmikkel\reasons\assetbundles\reasons;
 
 use Craft;
 use craft\base\Element;
+use craft\base\Volume;
 use craft\elements\Asset;
 use craft\elements\Category;
 use craft\elements\Entry;
@@ -105,6 +106,7 @@ class ReasonsAssetBundle extends AssetBundle
             $segments = Craft::$app->getRequest()->getSegments();
             if (\count($segments) === 3 && $segments[0] === 'assets') {
                 $volumeHandle = $segments[1];
+                /** @var Volume $volume */
                 $volume = Craft::$app->getVolumes()->getVolumeByHandle($volumeHandle);
                 if ($volume) {
                     $data['renderContext'] = "assetSource:{$volume->id}";

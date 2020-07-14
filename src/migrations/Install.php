@@ -15,7 +15,7 @@ use mmikkel\reasons\Reasons;
 use Craft;
 use craft\config\DbConfig;
 use craft\db\Migration;
-use mmikkel\reasons\records\Conditionals;
+
 use yii\db\Query;
 
 /**

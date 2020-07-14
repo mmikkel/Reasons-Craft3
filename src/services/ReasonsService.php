@@ -314,10 +314,6 @@ class ReasonsService extends Component
             ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = fieldLayoutId')
             ->all();
 
-        if (!$rows) {
-            return [];
-        }
-
         // Map conditionals to field layouts, and convert field uids to ids
         $conditionals = [];
         foreach ($rows as $row) {
@@ -348,6 +344,7 @@ class ReasonsService extends Component
             $sources = [];
 
             $entryTypeRecords = EntryType::find()->all();
+            /** @var EntryType $entryTypeRecord */
             foreach ($entryTypeRecords as $entryTypeRecord) {
                 $sources["entryType:{$entryTypeRecord->id}"] = (int)$entryTypeRecord->fieldLayoutId;
                 $sources["section:{$entryTypeRecord->sectionId}"] = (int)$entryTypeRecord->fieldLayoutId;
@@ -374,9 +371,7 @@ class ReasonsService extends Component
             }
 
             $usersFieldLayout = Craft::$app->getFields()->getLayoutByType(User::class);
-            if ($usersFieldLayout) {
-                $sources['users'] = (int)$usersFieldLayout->id;
-            }
+            $sources['users'] = $usersFieldLayout->id;
 
             $this->sources = $sources;
 
