@@ -191,6 +191,9 @@ class ReasonsService extends Component
      */
     public function onProjectConfigRebuild(RebuildConfigEvent $event)
     {
+
+        Craft::$app->getProjectConfig()->remove('reasons_conditionals');
+
         $rows = (new Query())
             ->select(['reasons.uid', 'reasons.conditionals', 'fieldlayouts.uid AS fieldLayoutUid'])
             ->from('{{%reasons}} AS reasons')
@@ -199,9 +202,10 @@ class ReasonsService extends Component
 
         foreach ($rows as $row) {
             $uid = $row['uid'];
-            $path = "reasons_conditionals.{$uid}";
-            $event->config[$path]['conditionals'] = $row['conditionals'];
-            $event->config[$path]['fieldLayoutUid'] = $row['fieldLayoutUid'];
+            $event->config['reasons_conditionals'][$uid] = [
+                'conditionals' => $row['conditionals'],
+                'fieldLayoutUid' => $row['fieldLayoutUid'],
+            ];
         }
 
         $this->clearCache();

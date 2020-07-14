@@ -101,7 +101,7 @@ class Reasons extends Plugin
             function (PluginEvent $event) {
                 if ($event->plugin === $this) {
                     $this->reasons->clearCache();
-                    Craft::$app->projectConfig->remove('reasons_conditionals');
+                    Craft::$app->getProjectConfig()->remove('reasons_conditionals');
                 }
             }
         );
