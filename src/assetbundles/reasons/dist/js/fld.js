@@ -1,3 +1,7 @@
+/** global: Craft */
+/** global: Garnish */
+/** global: $ */
+
 (function () {
 
     if (!window.Craft || !Craft.ReasonsPlugin) {

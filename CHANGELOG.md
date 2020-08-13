@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Fixed
+- Fixes an issue in Craft 3.5.3+, where conditionals would not render if field handles were visible  
+
 ## 2.2.0 - 2020-07-16
 ### Added
 - Adds Craft 3.5 compatibility. Thanks @brandonkelly!  

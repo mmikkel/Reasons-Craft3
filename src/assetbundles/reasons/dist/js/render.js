@@ -1,3 +1,7 @@
+/** global: Craft */
+/** global: Garnish */
+/** global: $ */
+
 (function () {
 
     if (!window.Craft || !Craft.ReasonsPlugin) {
@@ -300,17 +304,14 @@
 
                             switch (toggleFieldData.type) {
                                 case 'craft\\fields\\Lightswitch':
-                                    $toggleFieldInput = $toggleField.find('*:input:first');
+                                    $toggleFieldInput = $toggleField.find('.input *:input:first');
                                     if ($toggleFieldInput.length > 0) {
                                         toggleFieldValue = $toggleFieldInput.val() === '1' ? 'true' : 'false';
                                     }
                                     break;
                                 case 'craft\\fields\\Checkboxes':
                                 case 'craft\\fields\\RadioButtons':
-                                // case 'ButtonBox_Buttons':
-                                // case 'ButtonBox_Stars':
-                                // case 'ButtonBox_Width':
-                                    toggleFieldValue = $toggleField.find('input:checkbox:checked,input:radio:checked').map(function () {
+                                    toggleFieldValue = $toggleField.find('.input input:checkbox:checked,.input input:radio:checked').map(function () {
                                         return $(this).val();
                                     }).get();
                                     break;
@@ -319,12 +320,11 @@
                                 case 'craft\\fields\\Tags':
                                 case 'craft\\fields\\Assets':
                                 case 'craft\\fields\\Users':
-                                //case 'Calendar_Event':
                                     var elementSelect = $toggleField.find('[data-reasonselementselect]').data('elementSelect') || null;
                                     toggleFieldValue = elementSelect && elementSelect.totalSelected ? 'notnull' : 'null';
                                     break;
                                 default:
-                                    $toggleFieldInput = $toggleField.find('*:input:first');
+                                    $toggleFieldInput = $toggleField.find('.input *:input:first');
                                     toggleFieldValue = $toggleFieldInput.val();
                                     break;
                             }
