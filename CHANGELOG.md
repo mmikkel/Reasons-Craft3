@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## Unreleased
 ### Fixed  
 - Fixes an issue where installing Craft using existing Project Config yaml files could make Reasons throw an exception  
+- Fixes an issue where Reasons would not delete conditionals from the Project Config when related field layouts were deleted in Craft  
 
 ## 2.2.1 - 2020-08-13
 

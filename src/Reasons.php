@@ -137,11 +137,17 @@ class Reasons extends Plugin
             }
         );
 
-        // Clear data caches when field layouts are deleted
+        // Delete conditionals when field layouts are deleted
         Event::on(
             Fields::class,
             Fields::EVENT_AFTER_DELETE_FIELD_LAYOUT,
-            [$this->reasons, 'clearCache']
+            function (FieldLayoutEvent $event) {
+                $fieldLayout = $event->layout;
+                if (!$fieldLayout) {
+                    return;
+                }
+                $this->reasons->deleteFieldLayoutConditionals($fieldLayout);
+            }
         );
 
         // Clear data caches when fields are saved
