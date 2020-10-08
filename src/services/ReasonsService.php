@@ -10,8 +10,6 @@
 
 namespace mmikkel\reasons\services;
 
-use mmikkel\reasons\Reasons;
-
 use Craft;
 use craft\db\Query;
 use craft\base\Component;
@@ -36,6 +34,8 @@ use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\models\FieldLayout;
 use craft\records\EntryType;
+
+use mmikkel\reasons\Reasons;
 
 /**
  * @author    Mats Mikkel Rummelhoff
@@ -127,7 +127,10 @@ class ReasonsService extends Component
     public function onProjectConfigChange(ConfigEvent $event)
     {
 
+        $this->clearCache();
+
         $uid = $event->tokenMatches[0];
+        $data = $event->newValue;
 
         $id = (new Query())
             ->select(['id'])
@@ -138,23 +141,49 @@ class ReasonsService extends Component
         $isNew = empty($id);
 
         if ($isNew) {
-            $fieldLayoutId = (int)Db::idByUid('{{%fieldlayouts}}', $event->newValue['fieldLayoutUid']);
-            Craft::$app->db->createCommand()
-                ->insert('{{%reasons}}', [
-                    'fieldLayoutId' => $fieldLayoutId,
-                    'conditionals' => $event->newValue['conditionals'],
-                    'uid' => $uid,
-                ])
-                ->execute();
-        } else {
-            Craft::$app->db->createCommand()
-                ->update('{{%reasons}}', [
-                    'conditionals' => $event->newValue['conditionals'],
-                ], ['id' => $id])
-                ->execute();
-        }
 
-        $this->clearCache();
+            // Save new conditionals
+            $fieldLayoutId = Db::idByUid('{{%fieldlayouts}}', $data['fieldLayoutUid']);
+
+            if ($fieldLayoutId === null) {
+                // The field layout might not've synced yet. Defer to Project Config
+                Craft::$app->getProjectConfig()->defer($event, [$this, __FUNCTION__]);
+                return;
+            }
+
+            $transaction = Craft::$app->getDb()->beginTransaction();
+
+            try {
+                Craft::$app->db->createCommand()
+                    ->insert('{{%reasons}}', [
+                        'fieldLayoutId' => $fieldLayoutId,
+                        'conditionals' => $data['conditionals'],
+                        'uid' => $uid,
+                    ])
+                    ->execute();
+                $transaction->commit();
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
+
+        } else {
+
+            // Update existing conditionals
+            $transaction = Craft::$app->getDb()->beginTransaction();
+
+            try {
+                Craft::$app->db->createCommand()
+                    ->update('{{%reasons}}', [
+                        'conditionals' => $data['conditionals'],
+                    ], ['id' => $id])
+                    ->execute();
+                $transaction->commit();
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
+        }
 
     }
 
@@ -165,6 +194,8 @@ class ReasonsService extends Component
     public function onProjectConfigDelete(ConfigEvent $event)
     {
 
+        $this->clearCache();
+
         $uid = $event->tokenMatches[0];
 
         $id = (new Query())
@@ -173,15 +204,20 @@ class ReasonsService extends Component
             ->where(['uid' => $uid])
             ->scalar();
 
-        if (!$id) {
-            return;
+        if ($id) {
+
+            $transaction = Craft::$app->getDb()->beginTransaction();
+
+            try {
+                Craft::$app->db->createCommand()
+                    ->delete('{{%reasons}}', ['id' => $id])
+                    ->execute();
+                $transaction->commit();
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
         }
-
-        Craft::$app->db->createCommand()
-            ->delete('{{%reasons}}', ['id' => $id])
-            ->execute();
-
-        $this->clearCache();
 
     }
 

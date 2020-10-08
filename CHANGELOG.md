@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Fixed  
+- Fixes an issue where installing Craft using existing Project Config yaml files could make Reasons throw an exception  
+
 ## 2.2.1 - 2020-08-13
 
 ### Fixed
