@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 2.2.2 - 2020-10-08
 ### Fixed  
-- Fixes an issue where installing Craft using existing Project Config yaml files could make Reasons throw an exception  
+- Fixes an issue where Reasons could cause an exception when installing Craft using existing project config Yaml files  
 - Fixes an issue where Reasons would not delete conditionals from the Project Config when related field layouts were deleted in Craft  
+- Fixes an issue where deleted conditionals would not be removed from the Project Config when it was rebuilt  
 
 ## 2.2.1 - 2020-08-13
 

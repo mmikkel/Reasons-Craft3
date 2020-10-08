@@ -230,6 +230,8 @@ class ReasonsService extends Component
 
         Craft::$app->getProjectConfig()->remove('reasons_conditionals');
 
+        $event->config['reasons_conditionals'] = [];
+
         $rows = (new Query())
             ->select(['reasons.uid', 'reasons.conditionals', 'fieldlayouts.uid AS fieldLayoutUid'])
             ->from('{{%reasons}} AS reasons')
@@ -237,10 +239,15 @@ class ReasonsService extends Component
             ->all();
 
         foreach ($rows as $row) {
-            $uid = $row['uid'];
+            $uid = $row['uid'] ?? null;
+            $conditionals = $row['conditionals'] ?? null;
+            $fieldLayoutUid = $row['fieldLayoutUid'] ?? null;
+            if (!$uid || !$conditionals || !$fieldLayoutUid) {
+                continue;
+            }
             $event->config['reasons_conditionals'][$uid] = [
-                'conditionals' => $row['conditionals'],
-                'fieldLayoutUid' => $row['fieldLayoutUid'],
+                'conditionals' => $conditionals,
+                'fieldLayoutUid' => $fieldLayoutUid,
             ];
         }
 
