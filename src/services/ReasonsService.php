@@ -358,7 +358,7 @@ class ReasonsService extends Component
         $rows = (new Query())
             ->select(['reasons.id', 'reasons.fieldLayoutId', 'reasons.conditionals'])
             ->from('{{%reasons}} AS reasons')
-            ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = fieldLayoutId')
+            ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = reasons.fieldLayoutId')
             ->all();
 
         // Map conditionals to field layouts, and convert field uids to ids
