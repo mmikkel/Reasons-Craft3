@@ -235,7 +235,7 @@ class ReasonsService extends Component
         $rows = (new Query())
             ->select(['reasons.uid', 'reasons.conditionals', 'fieldlayouts.uid AS fieldLayoutUid'])
             ->from('{{%reasons}} AS reasons')
-            ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = reasons.fieldLayoutId')
+            ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = reasons."fieldLayoutId"')
             ->all();
 
         foreach ($rows as $row) {

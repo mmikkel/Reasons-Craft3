@@ -26,7 +26,7 @@ class m200603_004000_projectconfig extends Migration
             
             $rows = (new Query())
                 ->select(['reasons.fieldLayoutId', 'reasons.conditionals', 'reasons.uid', 'fieldlayouts.uid AS fieldLayoutUid'])
-                ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = reasons.fieldLayoutId')
+                ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = reasons."fieldLayoutId"')
                 ->from('{{%reasons}} AS reasons')
                 ->all();
             
