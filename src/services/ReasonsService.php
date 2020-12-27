@@ -14,6 +14,7 @@ use Craft;
 use craft\db\Query;
 use craft\base\Component;
 use craft\base\FieldInterface;
+use craft\db\Table;
 use craft\elements\User;
 use craft\events\ConfigEvent;
 use craft\events\RebuildConfigEvent;
@@ -143,7 +144,7 @@ class ReasonsService extends Component
         if ($isNew) {
 
             // Save new conditionals
-            $fieldLayoutId = Db::idByUid('{{%fieldlayouts}}', $data['fieldLayoutUid']);
+            $fieldLayoutId = Db::idByUid(Table::FIELDLAYOUTS, $data['fieldLayoutUid']);
 
             if ($fieldLayoutId === null) {
                 // The field layout might not've synced yet. Defer to Project Config
@@ -235,7 +236,7 @@ class ReasonsService extends Component
         $rows = (new Query())
             ->select(['reasons.uid', 'reasons.conditionals', 'fieldlayouts.uid AS fieldLayoutUid'])
             ->from('{{%reasons}} AS reasons')
-            ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = reasons.fieldLayoutId')
+            ->innerJoin(['fieldlayouts' => Table::FIELDLAYOUTS], '[[fieldlayouts.id]] = [[reasons.fieldLayoutId]]')
             ->all();
 
         foreach ($rows as $row) {
@@ -302,11 +303,11 @@ class ReasonsService extends Component
         $return = [];
         $conditionals = Json::decodeIfJson($conditionals);
         foreach ($conditionals as $targetFieldId => $statements) {
-            $targetFieldUid = Db::uidById('{{%fields}}', $targetFieldId);
+            $targetFieldUid = Db::uidById(Table::FIELDS, $targetFieldId);
             $return[$targetFieldUid] = \array_map(function (array $rules) {
                 return \array_map(function (array $rule) {
                     return [
-                        'field' => Db::uidById('{{%fields}}', $rule['fieldId']),
+                        'field' => Db::uidById(Table::FIELDS, $rule['fieldId']),
                         'compare' => $rule['compare'],
                         'value' => $rule['value'],
                     ];
@@ -329,11 +330,11 @@ class ReasonsService extends Component
         try {
             $conditionals = Json::decodeIfJson($conditionals);
             foreach ($conditionals as $targetFieldUid => $statements) {
-                $targetFieldId = Db::idByUid('{{%fields}}', $targetFieldUid);
+                $targetFieldId = Db::idByUid(Table::FIELDS, $targetFieldUid);
                 $return[$targetFieldId] = \array_map(function (array $rules) {
                     return \array_map(function (array $rule) {
                         return [
-                            'fieldId' => Db::idByUid('{{%fields}}', $rule['field']),
+                            'fieldId' => Db::idByUid(Table::FIELDS, $rule['field']),
                             'compare' => $rule['compare'],
                             'value' => $rule['value'],
                         ];
@@ -358,7 +359,7 @@ class ReasonsService extends Component
         $rows = (new Query())
             ->select(['reasons.id', 'reasons.fieldLayoutId', 'reasons.conditionals'])
             ->from('{{%reasons}} AS reasons')
-            ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = reasons.fieldLayoutId')
+            ->innerJoin(['fieldlayouts' => Table::FIELDLAYOUTS], '[[fieldlayouts.id]] = [[reasons.fieldLayoutId]]')
             ->all();
 
         // Map conditionals to field layouts, and convert field uids to ids

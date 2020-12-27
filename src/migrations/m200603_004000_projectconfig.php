@@ -6,6 +6,7 @@ namespace mmikkel\reasons\migrations;
 use Craft;
 use craft\db\Migration;
 use craft\db\Query;
+use craft\db\Table;
 use craft\helpers\Db;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
@@ -26,7 +27,7 @@ class m200603_004000_projectconfig extends Migration
             
             $rows = (new Query())
                 ->select(['reasons.fieldLayoutId', 'reasons.conditionals', 'reasons.uid', 'fieldlayouts.uid AS fieldLayoutUid'])
-                ->innerJoin('{{%fieldlayouts}} AS fieldlayouts', 'fieldlayouts.id = reasons.fieldLayoutId')
+                ->innerJoin(['fieldlayouts' => Table::FIELDLAYOUTS], '[[fieldlayouts.id]] = [[reasons.fieldLayoutId]]')
                 ->from('{{%reasons}} AS reasons')
                 ->all();
             
@@ -65,7 +66,7 @@ class m200603_004000_projectconfig extends Migration
         $conditionals = Json::decodeIfJson($conditionals);
         foreach ($conditionals as $targetFieldIdOrUid => $statements) {
             if (!StringHelper::isUUID($targetFieldIdOrUid)) {
-                $targetFieldUid = Db::uidById('{{%fields}}', $targetFieldIdOrUid);
+                $targetFieldUid = Db::uidById(Table::FIELDS, $targetFieldIdOrUid);
             } else {
                 $targetFieldUid = $targetFieldIdOrUid;
             }
@@ -73,7 +74,7 @@ class m200603_004000_projectconfig extends Migration
                 return \array_map(function (array $rule) {
                     $fieldIdOrUid = $rule['fieldId'] ?? $rule['field'];
                     if (!StringHelper::isUUID($fieldIdOrUid)) {
-                        $fieldUid = Db::uidById('{{%fields}}', $fieldIdOrUid);
+                        $fieldUid = Db::uidById(Table::FIELDS, $fieldIdOrUid);
                     } else {
                         $fieldUid = $fieldIdOrUid;
                     }

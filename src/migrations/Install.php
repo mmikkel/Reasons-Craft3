@@ -10,6 +10,7 @@
 
 namespace mmikkel\reasons\migrations;
 
+use craft\db\Table;
 use mmikkel\reasons\Reasons;
 
 use Craft;
@@ -101,7 +102,7 @@ class Install extends Migration
             $this->db->getForeignKeyName('{{%reasons}}', 'fieldLayoutId'),
             '{{%reasons}}',
             'fieldLayoutId',
-            '{{%fieldlayouts}}',
+            Table::FIELDLAYOUTS,
             'id',
             'CASCADE',
             'CASCADE'
