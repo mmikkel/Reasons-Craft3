@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.2.4 - 2021-01-20
+### Fixed
+- Fixes an issue where Lightswitch toggle fields would not work properly on Craft 3.5.18+  
+
 ## 2.2.3 - 2020-12-27  
 ### Fixed  
 - Fixes Postgres SQL errors  

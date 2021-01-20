@@ -306,7 +306,12 @@
                                 case 'craft\\fields\\Lightswitch':
                                     $toggleFieldInput = $toggleField.find('.input *:input:first');
                                     if ($toggleFieldInput.length > 0) {
-                                        toggleFieldValue = $toggleFieldInput.val() === '1' ? 'true' : 'false';
+                                        // Lightswitch markup changed in Craft 3.5.18
+                                        if ($toggleFieldInput.is('button')) {
+                                            toggleFieldValue = $toggleFieldInput.attr('aria-checked');
+                                        } else if ($toggleFieldInput.is('input')) {
+                                            toggleFieldValue = $toggleFieldInput.val() === '1' ? 'true' : 'false';
+                                        }
                                     }
                                     break;
                                 case 'craft\\fields\\Checkboxes':
