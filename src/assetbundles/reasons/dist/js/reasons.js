@@ -19,20 +19,21 @@
         USERS_HANDLE: 'users',
         FIELDS_HANDLE: 'field',
 
-        ASSET_ACTION: 'assets/save-asset',
-        ASSET_SOURCE_ACTION: 'volumes/save-volume',
-        CATEGORY_ACTION: 'categories/save-category',
-        CATEGORY_GROUP_ACTION: 'categories/save-group',
-        GLOBAL_SET_CONTENT_ACTION: 'globals/save-content',
-        GLOBAL_SET_ACTION: 'globals/save-set',
-        ENTRY_ACTION: 'entries/save-entry',
-        ENTRY_REVISION_ACTION: 'entry-revisions/save-draft',
-        ENTRY_TYPE_ACTION: 'sections/save-entry-type',
-        USERS_ACTION: 'users/save-user',
-        USERS_FIELDS_ACTION: 'users/save-field-layout',
-        TAG_ACTION: 'tags/save-tag',
-        TAG_GROUP_ACTION: 'tags/save-tag-group',
-        FIELDS_ACTION: 'fields/save-field',
+        ASSET_SAVE_ACTION: 'assets/save-asset',
+        VOLUME_SAVE_ACTION: 'volumes/save-volume',
+        CATEGORY_SAVE_ACTION: 'categories/save-category',
+        CATEGORY_GROUP_SAVE_ACTION: 'categories/save-group',
+        GLOBAL_SET_CONTENT_SAVE_ACTION: 'globals/save-content',
+        GLOBAL_SET_SAVE_ACTION: 'globals/save-set',
+        ENTRY_SAVE_ACTION: 'entries/save-entry',
+        DRAFT_SAVE_ACTION: 'entry-revisions/save-draft',
+        DRAFT_PUBLISH_ACTION: 'entry-revisions/publish-draft',
+        ENTRY_TYPE_SAVE_ACTION: 'sections/save-entry-type',
+        USERS_SAVE_ACTION: 'users/save-user',
+        USERS_FIELDS_SAVE_ACTION: 'users/save-field-layout',
+        TAG_SAVE_ACTION: 'tags/save-tag',
+        TAG_GROUP_SAVE_ACTION: 'tags/save-tag-group',
+        FIELDS_SAVE_ACTION: 'fields/save-field',
 
         RENDER_CONTEXT: 'render',
         LAYOUT_DESIGNER_CONTEXT: 'fld',
@@ -90,16 +91,34 @@
             var now = new Date().getTime(),
                 doInitElementEditor = (function () {
 
-                    var timestamp = new Date().getTime(),
-                        $elementEditor = $('.elementeditor:last'),
-                        $hud = $elementEditor.length > 0 ? $elementEditor.closest('.hud') : false,
-                        elementEditor = $hud && $hud.length > 0 ? $hud.data('elementEditor') : false,
-                        $form = elementEditor ? elementEditor.$form : false;
+                    var timestamp = new Date().getTime();
+                    var $elementEditor = $('.elementeditor:last,.element-editor:last');
 
-                    if ($form) {
-                        elementEditor['_reasonsForm'] = new this.ConditionalsRenderer($form, conditionals);
-                        elementEditor.hud.on('hide', $.proxy(this.destroyElementEditorForm, this, elementEditor));
-                    } else if (timestamp - now < 2000) { // Poll for 2 secs
+                    var formInitialised = false;
+
+                    if ($elementEditor.length && $elementEditor.hasClass('elementeditor')) {
+                        // Craft 3.6
+                        var $hud = $elementEditor.length > 0 ? $elementEditor.closest('.hud') : false;
+                        var elementEditor = $hud && $hud.length > 0 ? $hud.data('elementEditor') : false;
+                        var $form = elementEditor ? elementEditor.$form : false;
+                        if ($form) {
+                            elementEditor['_reasonsForm'] = new this.ConditionalsRenderer($form, conditionals);
+                            elementEditor.hud.on('hide', $.proxy(this.destroyElementEditorForm, this, elementEditor));
+                        }
+                        formInitialised = true;
+                    } else {
+                        // Craft 3.7 (Slideouts)
+                        var elementEditor = $elementEditor.data('elementEditor');
+                        if (elementEditor) {
+                            elementEditor['_reasonsForm'] = new this.ConditionalsRenderer($elementEditor, conditionals);
+                            elementEditor.on('hideHud', function () {
+                                $.proxy(this.destroyElementEditorForm, this, elementEditor);
+                            });
+                        }
+                        formInitialised = true;
+                    }
+
+                    if (!formInitialised && timestamp - now < 2000) {
                         Garnish.requestAnimationFrame(doInitElementEditor);
                     }
 
@@ -213,43 +232,44 @@
 
             switch (action) {
 
-                case this.ASSET_ACTION:
-                case this.ASSET_SOURCE_ACTION :
+                case this.ASSET_SAVE_ACTION:
+                case this.VOLUME_SAVE_ACTION :
                     type = this.ASSET_SOURCE_HANDLE;
                     idInputSelector = 'input[type="hidden"][name="volumeId"]';
                     break;
 
-                case this.CATEGORY_ACTION :
-                case this.CATEGORY_GROUP_ACTION :
+                case this.CATEGORY_SAVE_ACTION :
+                case this.CATEGORY_GROUP_SAVE_ACTION :
                     type = this.CATEGORY_GROUP_HANDLE;
                     idInputSelector = 'input[type="hidden"][name="groupId"]';
                     break;
 
-                case this.GLOBAL_SET_CONTENT_ACTION:
-                case this.GLOBAL_SET_ACTION :
+                case this.GLOBAL_SET_CONTENT_SAVE_ACTION:
+                case this.GLOBAL_SET_SAVE_ACTION :
                     type = this.GLOBAL_SET_HANDLE;
                     idInputSelector = 'input[type="hidden"][name="setId"]';
                     break;
 
-                case this.ENTRY_ACTION :
-                case this.ENTRY_REVISION_ACTION :
+                case this.ENTRY_SAVE_ACTION :
+                case this.DRAFT_SAVE_ACTION :
+                case this.DRAFT_PUBLISH_ACTION :
                     var $entryType = $form.find('select#entryType, input[type="hidden"][name="entryTypeId"], input[type="hidden"][name="typeId"], #' + namespace + 'entryType');
                     type = $entryType.length ? this.ENTRY_TYPE_HANDLE : this.SECTION_HANDLE;
                     idInputSelector = $entryType.length ? 'select#entryType, input[type="hidden"][name="entryTypeId"], input[type="hidden"][name="typeId"], #' + namespace + 'entryType' : 'input[type="hidden"][name="sectionId"], #' + namespace + 'section';
                     break;
 
-                case this.ENTRY_TYPE_ACTION :
+                case this.ENTRY_TYPE_SAVE_ACTION :
                     type = this.ENTRY_TYPE_HANDLE;
                     idInputSelector = 'input[type="hidden"][name="entryTypeId"]';
                     break;
 
-                case this.USERS_ACTION :
-                case this.USERS_FIELDS_ACTION :
+                case this.USERS_SAVE_ACTION :
+                case this.USERS_FIELDS_SAVE_ACTION :
                     type = this.USERS_HANDLE;
                     break;
 
-                case this.TAG_ACTION :
-                case this.TAG_GROUP_ACTION :
+                case this.TAG_SAVE_ACTION :
+                case this.TAG_GROUP_SAVE_ACTION :
                     type = this.TAG_GROUP_HANDLE;
                     idInputSelector = 'input[type="hidden"][name="tagGroupId"]';
                     break;
@@ -281,21 +301,22 @@
 
             switch (action) {
 
-                case this.ASSET_ACTION :
-                case this.GLOBAL_SET_CONTENT_ACTION :
-                case this.ENTRY_ACTION :
-                case this.ENTRY_REVISION_ACTION :
-                case this.CATEGORY_ACTION :
-                case this.USERS_ACTION :
-                case this.TAG_ACTION :
+                case this.ASSET_SAVE_ACTION :
+                case this.GLOBAL_SET_CONTENT_SAVE_ACTION :
+                case this.ENTRY_SAVE_ACTION :
+                case this.DRAFT_SAVE_ACTION :
+                case this.DRAFT_PUBLISH_ACTION :
+                case this.CATEGORY_SAVE_ACTION :
+                case this.USERS_SAVE_ACTION :
+                case this.TAG_SAVE_ACTION :
                     return this.RENDER_CONTEXT;
 
-                case this.ASSET_SOURCE_ACTION :
-                case this.CATEGORY_GROUP_ACTION :
-                case this.GLOBAL_SET_ACTION :
-                case this.ENTRY_TYPE_ACTION :
-                case this.USERS_FIELDS_ACTION :
-                case this.TAG_GROUP_ACTION :
+                case this.VOLUME_SAVE_ACTION :
+                case this.CATEGORY_GROUP_SAVE_ACTION :
+                case this.GLOBAL_SET_SAVE_ACTION :
+                case this.ENTRY_TYPE_SAVE_ACTION :
+                case this.USERS_FIELDS_SAVE_ACTION :
+                case this.TAG_GROUP_SAVE_ACTION :
                     return this.LAYOUT_DESIGNER_CONTEXT;
 
             }
