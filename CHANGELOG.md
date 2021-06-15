@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 2.2.5
 ### Fixed  
-- Fixes Craft 3.7 compatibility  
+- Fixes Craft 3.7 compatibility issues  
 
 ## 2.2.4 - 2021-01-20
 ### Fixed
