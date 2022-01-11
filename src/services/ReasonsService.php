@@ -49,11 +49,17 @@ class ReasonsService extends Component
     /** @var int */
     const CACHE_TTL = 1800;
 
-    /** @var array */
+    /** @var FieldInterface[] */
     protected $allFields;
 
     /** @var array */
     protected $sources;
+
+    /** @var int[] */
+    protected $fieldIdsByUid;
+
+    /** @var string[] */
+    protected $fieldUidsById;
 
     // Public Methods
     // =========================================================================
@@ -303,11 +309,12 @@ class ReasonsService extends Component
         $return = [];
         $conditionals = Json::decodeIfJson($conditionals);
         foreach ($conditionals as $targetFieldId => $statements) {
-            $targetFieldUid = Db::uidById(Table::FIELDS, $targetFieldId);
+            $targetFieldUid = $this->getFieldUidById((int)$targetFieldId);
             $return[$targetFieldUid] = \array_map(function (array $rules) {
                 return \array_map(function (array $rule) {
+                    $fieldId = $rule['fieldId'];
                     return [
-                        'field' => Db::uidById(Table::FIELDS, $rule['fieldId']),
+                        'field' => $this->getFieldUidById("$fieldId"),
                         'compare' => $rule['compare'],
                         'value' => $rule['value'],
                     ];
@@ -330,11 +337,11 @@ class ReasonsService extends Component
         try {
             $conditionals = Json::decodeIfJson($conditionals);
             foreach ($conditionals as $targetFieldUid => $statements) {
-                $targetFieldId = Db::idByUid(Table::FIELDS, $targetFieldUid);
+                $targetFieldId = $this->getFieldIdByUid($targetFieldUid);
                 $return[$targetFieldId] = \array_map(function (array $rules) {
                     return \array_map(function (array $rule) {
                         return [
-                            'fieldId' => Db::idByUid(Table::FIELDS, $rule['field']),
+                            'fieldId' => $this->getFieldIdByUid($rule['field']),
                             'compare' => $rule['compare'],
                             'value' => $rule['value'],
                         ];
@@ -344,6 +351,7 @@ class ReasonsService extends Component
         } catch (\Throwable $e) {
             Craft::error($e->getMessage(), __METHOD__);
         }
+
         return $return;
     }
 
@@ -502,6 +510,42 @@ class ReasonsService extends Component
             $this->allFields = Craft::$app->getFields()->getAllFields('global');
         }
         return $this->allFields;
+    }
+
+    /**
+     * Return the UID for a field, based on its database ID
+     *
+     * @param int $fieldId
+     * @return string
+     */
+    protected function getFieldUidById(int $fieldId): string
+    {
+        if (!isset($this->fieldUidsById)) {
+            $allFields = $this->getAllFields();
+            $this->fieldUidsById = \array_reduce($allFields, function (array $carry, FieldInterface $field) {
+                $carry["{$field->id}"] = $field->uid;
+                return $carry;
+            }, []);
+        }
+        return $this->fieldUidsById["$fieldId"];
+    }
+
+    /**
+     * Return the database ID for a field, based on its UID
+     *
+     * @param string $fieldUid
+     * @return int
+     */
+    protected function getFieldIdByUid(string $fieldUid): int
+    {
+        if (!isset($this->fieldIdsByUid)) {
+            $allFields = $this->getAllFields();
+            $this->fieldIdsByUid = \array_reduce($allFields, function (array $carry, FieldInterface $field) {
+                $carry[$field->uid] = (int)$field->id;
+                return $carry;
+            }, []);
+        }
+        return $this->fieldIdsByUid[$fieldUid];
     }
 
     /**

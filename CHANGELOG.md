@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Fixed
+- Fixes an issue where Reasons could create a significant amount of duplicate control panel database queries, in development environments. #15
+
 ## 2.2.5 - 2021-06-15  
 ### Fixed  
 - Fixes Craft 3.7 compatibility issues  
