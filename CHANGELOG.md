@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 2.2.6 - 2022-01-13
 ### Fixed
-- Fixes an issue where Reasons could create a significant amount of duplicate control panel database queries, in development environments. #15
+- Fixes an issue where Reasons could create a significant amount of duplicate database queries inside the control panel. Fixes #15.
 
 ## 2.2.5 - 2021-06-15  
 ### Fixed  

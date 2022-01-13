@@ -2,7 +2,7 @@
     "name": "mmikkel/reasons",
     "description": "Adds conditionals to field layouts.",
     "type": "craft-plugin",
-    "version": "2.2.5",
+    "version": "2.2.6",
     "keywords": [
         "craft",
         "cms",
