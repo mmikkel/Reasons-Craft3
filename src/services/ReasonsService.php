@@ -50,10 +50,10 @@ class ReasonsService extends Component
     /** @var int */
     const CACHE_TTL = 1800;
 
-    /** @var FieldInterface[] */
+    /** @var Field[] */
     protected $allFields;
 
-    /** @var FieldInterface[] */
+    /** @var Field[] */
     protected $toggleFields;
 
     /** @var array */
@@ -457,9 +457,6 @@ class ReasonsService extends Component
             $fields = $this->getAllFields();
             $toggleFieldTypes = $this->getToggleFieldTypes();
             foreach ($fields as $field) {
-                if (!$field instanceof Field) {
-                    continue;
-                }
                 $fieldType = \get_class($field);
                 if (!\in_array($fieldType, $toggleFieldTypes)) {
                     continue;
@@ -509,21 +506,21 @@ class ReasonsService extends Component
         $handles = [];
         $fields = $this->getAllFields();
         foreach ($fields as $field) {
-            if (!$fields instanceof Field) {
-                continue;
-            }
             $handles[$field->handle] = (int)$field->id;
         }
         return $handles;
     }
 
     /**
-     * @return FieldInterface[]
+     * @return Field[]
      */
     protected function getAllFields(): array
     {
         if (!isset($this->allFields)) {
-            $this->allFields = Craft::$app->getFields()->getAllFields('global');
+            $globalFields = Craft::$app->getFields()->getAllFields('global');
+            $this->allFields = \array_filter($globalFields, function (FieldInterface $field) {
+                return $field instanceof Field;
+            });
         }
         return $this->allFields;
     }
@@ -538,10 +535,7 @@ class ReasonsService extends Component
     {
         if (!isset($this->fieldUidsById)) {
             $allFields = $this->getAllFields();
-            $this->fieldUidsById = \array_reduce($allFields, function (array $carry, FieldInterface $field) {
-                if (!$field instanceof Field) {
-                    return $carry;
-                }
+            $this->fieldUidsById = \array_reduce($allFields, function (array $carry, Field $field) {
                 $carry["{$field->id}"] = $field->uid;
                 return $carry;
             }, []);
@@ -559,10 +553,7 @@ class ReasonsService extends Component
     {
         if (!isset($this->fieldIdsByUid)) {
             $allFields = $this->getAllFields();
-            $this->fieldIdsByUid = \array_reduce($allFields, function (array $carry, FieldInterface $field) {
-                if (!$field instanceof Field) {
-                    return $carry;
-                }
+            $this->fieldIdsByUid = \array_reduce($allFields, function (array $carry, Field $field) {
                 $carry[$field->uid] = (int)$field->id;
                 return $carry;
             }, []);
