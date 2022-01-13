@@ -509,6 +509,9 @@ class ReasonsService extends Component
         $handles = [];
         $fields = $this->getAllFields();
         foreach ($fields as $field) {
+            if (!$fields instanceof Field) {
+                continue;
+            }
             $handles[$field->handle] = (int)$field->id;
         }
         return $handles;
@@ -536,6 +539,9 @@ class ReasonsService extends Component
         if (!isset($this->fieldUidsById)) {
             $allFields = $this->getAllFields();
             $this->fieldUidsById = \array_reduce($allFields, function (array $carry, FieldInterface $field) {
+                if (!$field instanceof Field) {
+                    return $carry;
+                }
                 $carry["{$field->id}"] = $field->uid;
                 return $carry;
             }, []);
@@ -554,6 +560,9 @@ class ReasonsService extends Component
         if (!isset($this->fieldIdsByUid)) {
             $allFields = $this->getAllFields();
             $this->fieldIdsByUid = \array_reduce($allFields, function (array $carry, FieldInterface $field) {
+                if (!$field instanceof Field) {
+                    return $carry;
+                }
                 $carry[$field->uid] = (int)$field->id;
                 return $carry;
             }, []);
