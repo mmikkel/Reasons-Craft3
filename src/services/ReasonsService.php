@@ -11,6 +11,7 @@
 namespace mmikkel\reasons\services;
 
 use Craft;
+use craft\base\Field;
 use craft\db\Query;
 use craft\base\Component;
 use craft\base\FieldInterface;
@@ -51,6 +52,9 @@ class ReasonsService extends Component
 
     /** @var FieldInterface[] */
     protected $allFields;
+
+    /** @var FieldInterface[] */
+    protected $toggleFields;
 
     /** @var array */
     protected $sources;
@@ -93,7 +97,7 @@ class ReasonsService extends Component
 
         // Save it to the project config
         $path = "reasons_conditionals.{$uid}";
-        Craft::$app->projectConfig->set($path, [
+        Craft::$app->getProjectConfig()->set($path, [
             'fieldLayoutUid' => $layout->uid,
             'conditionals' => $conditionals,
         ]);
@@ -122,13 +126,15 @@ class ReasonsService extends Component
 
         // Remove it from the project config
         $path = "reasons_conditionals.{$uid}";
-        Craft::$app->projectConfig->remove($path);
+        Craft::$app->getProjectConfig()->remove($path);
 
         return true;
     }
 
     /**
      * @param ConfigEvent $event
+     * @return void
+     * @throws \Throwable
      * @throws \yii\db\Exception
      */
     public function onProjectConfigChange(ConfigEvent $event)
@@ -196,6 +202,8 @@ class ReasonsService extends Component
 
     /**
      * @param ConfigEvent $event
+     * @return void
+     * @throws \Throwable
      * @throws \yii\db\Exception
      */
     public function onProjectConfigDelete(ConfigEvent $event)
@@ -301,7 +309,7 @@ class ReasonsService extends Component
      * @param string|array $conditionals
      * @return string|null
      */
-    protected function prepConditionalsForProjectConfig($conditionals)
+    protected function prepConditionalsForProjectConfig($conditionals): ?string
     {
         if (!$conditionals) {
             return null;
@@ -309,12 +317,13 @@ class ReasonsService extends Component
         $return = [];
         $conditionals = Json::decodeIfJson($conditionals);
         foreach ($conditionals as $targetFieldId => $statements) {
-            $targetFieldUid = $this->getFieldUidById((int)$targetFieldId);
+            $targetFieldId = (int)$targetFieldId;
+            $targetFieldUid = $this->getFieldUidById($targetFieldId);
             $return[$targetFieldUid] = \array_map(function (array $rules) {
                 return \array_map(function (array $rule) {
-                    $fieldId = $rule['fieldId'];
+                    $fieldId = (int)$rule['fieldId'];
                     return [
-                        'field' => $this->getFieldUidById("$fieldId"),
+                        'field' => $this->getFieldUidById($fieldId),
                         'compare' => $rule['compare'],
                         'value' => $rule['value'],
                     ];
@@ -328,7 +337,7 @@ class ReasonsService extends Component
      * @param string|array $conditionals
      * @return array|null
      */
-    protected function normalizeConditionalsFromProjectConfig($conditionals)
+    protected function normalizeConditionalsFromProjectConfig($conditionals): ?array
     {
         if (!$conditionals) {
             return null;
@@ -338,10 +347,11 @@ class ReasonsService extends Component
             $conditionals = Json::decodeIfJson($conditionals);
             foreach ($conditionals as $targetFieldUid => $statements) {
                 $targetFieldId = $this->getFieldIdByUid($targetFieldUid);
-                $return[$targetFieldId] = \array_map(function (array $rules) {
+                $return["$targetFieldId"] = \array_map(function (array $rules) {
                     return \array_map(function (array $rule) {
+                        $fieldUid = $rule['field'];
                         return [
-                            'fieldId' => $this->getFieldIdByUid($rule['field']),
+                            'fieldId' => $this->getFieldIdByUid($fieldUid),
                             'compare' => $rule['compare'],
                             'value' => $rule['value'],
                         ];
@@ -351,7 +361,6 @@ class ReasonsService extends Component
         } catch (\Throwable $e) {
             Craft::error($e->getMessage(), __METHOD__);
         }
-
         return $return;
     }
 
@@ -443,24 +452,28 @@ class ReasonsService extends Component
      */
     protected function getToggleFields(): array
     {
-        $toggleFieldTypes = $this->getToggleFieldTypes();
-        $toggleFields = [];
-        $fields = $this->getAllFields();
-        /** @var FieldInterface $field */
-        foreach ($fields as $field) {
-            $fieldType = \get_class($field);
-            if (!\in_array($fieldType, $toggleFieldTypes)) {
-                continue;
+        if (!isset($this->toggleFields)) {
+            $this->toggleFields = [];
+            $fields = $this->getAllFields();
+            $toggleFieldTypes = $this->getToggleFieldTypes();
+            foreach ($fields as $field) {
+                if (!$field instanceof Field) {
+                    continue;
+                }
+                $fieldType = \get_class($field);
+                if (!\in_array($fieldType, $toggleFieldTypes)) {
+                    continue;
+                }
+                $this->toggleFields[] = [
+                    'id' => (int)$field->id,
+                    'handle' => $field->handle,
+                    'name' => $field->name,
+                    'type' => $fieldType,
+                    'settings' => $field->getSettings(),
+                ];
             }
-            $toggleFields[] = [
-                'id' => (int)$field->id,
-                'handle' => $field->handle,
-                'name' => $field->name,
-                'type' => $fieldType,
-                'settings' => $field->getSettings(),
-            ];
         }
-        return $toggleFields;
+        return $this->toggleFields;
     }
 
     /**

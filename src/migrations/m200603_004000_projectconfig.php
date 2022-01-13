@@ -15,12 +15,17 @@ class m200603_004000_projectconfig extends Migration
 {
 
     /**
-     * @inheritDoc
+     * @return bool
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\base\NotSupportedException
+     * @throws \yii\web\ServerErrorHttpException
      */
     public function safeUp()
     {
         // Don't make the same config changes twice
-        $schemaVersion = Craft::$app->projectConfig
+        $schemaVersion = Craft::$app->getProjectConfig()
             ->get('plugins.reasons.schemaVersion', true);
 
         if (\version_compare($schemaVersion, '2.1.0', '<')) {
@@ -33,7 +38,7 @@ class m200603_004000_projectconfig extends Migration
             
             foreach ($rows as $row) {
                 $path = "reasons_conditionals.{$row['uid']}";
-                Craft::$app->projectConfig->set($path, [
+                Craft::$app->getProjectConfig()->set($path, [
                     'fieldLayoutUid' => $row['fieldLayoutUid'],
                     'conditionals' => $this->prepConditionalsForProjectConfig($row['conditionals']),
                 ]);
@@ -57,7 +62,7 @@ class m200603_004000_projectconfig extends Migration
      * @param string|array $conditionals
      * @return string|null
      */
-    protected function prepConditionalsForProjectConfig($conditionals)
+    protected function prepConditionalsForProjectConfig($conditionals): ?string
     {
         if (!$conditionals) {
             return null;

@@ -172,7 +172,7 @@ class Reasons extends Plugin
         );
 
         // Listen for appropriate Project Config changes
-        Craft::$app->projectConfig
+        Craft::$app->getProjectConfig()
             ->onAdd('reasons_conditionals.{uid}', [$this->reasons, 'onProjectConfigChange'])
             ->onUpdate('reasons_conditionals.{uid}', [$this->reasons, 'onProjectConfigChange'])
             ->onRemove('reasons_conditionals.{uid}', [$this->reasons, 'onProjectConfigDelete']);

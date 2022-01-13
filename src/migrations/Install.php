@@ -99,7 +99,7 @@ class Install extends Migration
     protected function addForeignKeys()
     {
         $this->addForeignKey(
-            $this->db->getForeignKeyName('{{%reasons}}', 'fieldLayoutId'),
+            $this->db->getForeignKeyName(),
             '{{%reasons}}',
             'fieldLayoutId',
             Table::FIELDLAYOUTS,
