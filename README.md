@@ -1,3 +1,8 @@
+# Update May 2022: REASONS IS RETIRED
+Since field layout conditionals are finally a core feature as of Craft 4.0 (released in May 2022), active development on Reasons has been retired and the plugin will not be updated to work with Craft 4.  
+
+_______
+
 # Reasons plugin for Craft CMS 3.x  
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mmikkel/Reasons-Craft3/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mmikkel/Reasons-Craft3/?branch=master)
