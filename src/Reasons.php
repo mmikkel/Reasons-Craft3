@@ -10,6 +10,7 @@
 
 namespace mmikkel\reasons;
 
+use craft\web\Application;
 use mmikkel\reasons\assetbundles\reasons\ReasonsAssetBundle;
 use mmikkel\reasons\services\ReasonsService;
 
@@ -44,16 +45,6 @@ use yii\base\InvalidConfigException;
  */
 class Reasons extends Plugin
 {
-    // Static Properties
-    // =========================================================================
-
-    /**
-     * @var Reasons
-     */
-    public static $plugin;
-
-    // Public Properties
-    // =========================================================================
 
     /**
      * @var string
@@ -79,7 +70,6 @@ class Reasons extends Plugin
     public function init()
     {
         parent::init();
-        self::$plugin = $this;
 
         $this->setComponents([
             'reasons' => ReasonsService::class,
@@ -179,19 +169,11 @@ class Reasons extends Plugin
 
         // Queue up asset bundle or handle AJAX action requests
         Event::on(
-            Plugins::class,
-            Plugins::EVENT_AFTER_LOAD_PLUGINS,
+            Application::class,
+            Application::EVENT_INIT,
             [$this, 'initReasons']
         );
 
-        Craft::info(
-            Craft::t(
-                'reasons',
-                '{name} plugin loaded',
-                ['name' => $this->name]
-            ),
-            __METHOD__
-        );
     }
 
     /**
@@ -205,7 +187,7 @@ class Reasons extends Plugin
         /** @var User $user */
         $user = Craft::$app->getUser()->getIdentity();
 
-        if ($request->getIsConsoleRequest() || !$request->getIsCpRequest() || $request->getIsSiteRequest() || !$user || !$user->can('accessCp')) {
+        if ($request->getIsConsoleRequest() || !$request->getIsCpRequest() || $request->getIsSiteRequest() || $request->getIsLoginRequest() || !$user || !$user->can('accessCp')) {
             return;
         }
 
@@ -280,7 +262,6 @@ class Reasons extends Plugin
             }
 
             $elementType = \get_class($element);
-            $conditionalsKey = null;
 
             switch ($elementType) {
                 case Entry::class:
