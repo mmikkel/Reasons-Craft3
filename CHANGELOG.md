@@ -4,9 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 2.3.0 - 2022-05-21
+## 2.3.0.1 - 2022-05-21
 
-> {warning} Craft 4.0 has been released, finally adding field layout conditionals to core! As such Reasons has become redundant, and will not be upgraded to support Craft 4 or later releases. **Before upgrading your site to Craft 4, make sure to note any conditionals that you'll want to re-create using the core feature, before uninstalling Reasons.**      
+> {warning} Craft 4.0 has been released, finally adding field layout conditionals to core! As such Reasons has become redundant, and will not be upgraded to support Craft 4 or later releases. **Before upgrading your site to Craft 4, make sure to note any conditionals that you'll want to re-create using the core feature, before uninstalling Reasons.**
+
+### Fixed
+- Fixes a regression error that could throw an exception  
+
+## 2.3.0 - 2022-05-21
 
 ### Fixed
 - Fixes an issue where conditionals would not work inside element slideouts for new entries or categories created via their fieldtypes    

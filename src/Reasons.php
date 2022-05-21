@@ -250,6 +250,7 @@ class Reasons extends Plugin
 
         if ($actionSegment === 'get-editor-html') {
 
+            $conditionalsKey = null;
             $elementId = (int)$request->getBodyParam('elementId');
 
             if (!$elementId) {
@@ -257,8 +258,6 @@ class Reasons extends Plugin
                 // Probably a new element
                 $attributes = $request->getBodyParam('attributes', []);
                 $elementType = $request->getBodyParam('elementType');
-
-                $conditionalsKey = null;
 
                 if ($elementType === Entry::class && $typeId = ($attributes['typeId'] ?? null)) {
                     $conditionalsKey = "entryType:$typeId";
