@@ -1,2 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
-	 x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"><path d="M50.3,29.6c-0.2-0.1-0.4-0.1-0.6,0l-30,20c-0.3,0.2-0.3,0.6,0,0.8l30,20c0.1,0.1,0.2,0.1,0.3,0.1s0.2,0,0.3-0.1l30-20  c0.3-0.2,0.3-0.6,0-0.8L50.3,29.6z M50,69.4L20.9,50L50,30.6L79.1,50L50,69.4z"></path></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" fill-rule="nonzero">
+            <g id="icon" fill="#1B2127">
+                <rect id="Rectangle" x="0" y="0" width="120" height="120" rx="40"></rect>
+            </g>
+            <g id="icon" transform="translate(25.731544, 37.012500)" fill="#FFFFFF">
+                <path d="M34.6052471,0.0841976815 C34.38072,-0.0280658938 34.1561928,-0.0280658938 33.9316656,0.0841976815 L0.252593045,22.5369128 C-0.0841976815,22.7614399 -0.0841976815,23.2104942 0.252593045,23.4350214 L33.9316656,45.8877364 C34.0439292,46 34.1561928,46 34.2684564,46 C34.38072,46 34.4929835,46 34.6052471,45.8877364 L68.2843197,23.4350214 C68.6211104,23.2104942 68.6211104,22.7614399 68.2843197,22.5369128 L34.6052471,0.0841976815 Z M34.2684564,42.3875 L5.16845638,22.9875 L34.2684564,3.5875 L63.3684564,22.9875 L34.2684564,42.3875 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

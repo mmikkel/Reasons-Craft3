@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Changed
 - Reasons now requires Craft 3.7.0+  
 - Reasons now requires PHP 7.2.5+  
+- Updated plugin icon  
 
 ## 2.2.6 - 2022-01-13
 ### Fixed
