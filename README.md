@@ -1,5 +1,10 @@
 # Update May 2022: REASONS IS RETIRED
-Since field layout conditionals are finally a core feature as of Craft 4.0 (released in May 2022), active development on Reasons has been retired and the plugin will not be updated to work with Craft 4.  
+
+Field layout conditionals is finally a core feature as of Craft 4.0 (released in May 2022)! ...which means you no longer need this plugin :)    
+
+**Reasons has been retired and the plugin will not be updated to work with Craft 4**, although I'll still make sure it keeps working for any upcoming Craft 3.x releases.  
+
+**Before upgrading your site to Craft 4, make sure to note down any conditionals that you'll want to re-create using the core feature, before uninstalling Reasons and Composer-removing it.**
 
 _______
 
@@ -21,19 +26,9 @@ Reasons adds simple conditionals to field layouts in Craft CMS – making it pos
 * Works with the new Drafts and Live Preview systems, and the new Asset edit pages in Craft 3.4  
 * Support for plugins (including third party fieldtypes, Craft Commerce and Solspace Calendar) has been *removed*  
 
-## Reasons for Craft 3?! But they said it'd never happen!
-
-Yeah, [I wasn't gonna do this](https://github.com/mmikkel/Reasons-Craft/wiki/Statement-on-Reasons-2,-Matrix-and-Craft-3). 
-
-Field layout conditionals were originally planned for core in a 3.x release. Currently, the feature is [on the roadmap for Craft 4.0](https://github.com/craftcms/cms/issues/805) - which may or may not release sometime in 2021. I figured, 3 years is a long enough wait (almost 5 years, if you count the original feature request!).   
-
-This plugin is *not* in active development; the primary purpose of this port is to make upgrading legacy Craft 2 projects using Reasons easier. I'm going to make sure the plugin continues to work on upcoming Craft releases until conditionals are in core, but I won't be adding any new features (read: no Matrix or Neo support incoming).  
-
-In short, consider Reasons on life support and as a stop-gap solution until Craft has conditionals in core.  
-
 ## Requirements
 
-**This plugin requires Craft CMS 3.5.0-RC1 or later.**
+**This plugin requires Craft CMS 3.7.0 or later. It does not work with Craft 4.0 or newer.**
 
 [Looking for the Craft 2 version?](https://github.com/mmikkel/Reasons-Craft)
 
