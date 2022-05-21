@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.3.0 - 2022-05-21
+
+> {warning} Craft 4.0 has been released, finally adding field layout conditionals to core! As such Reasons has become redundant, and will not be upgraded to support Craft 4 or later releases. Before upgrading your site to Craft 4, make sure to note any conditionals that you'll want to re-create using the core feature, before uninstalling Reasons.      
+
+### Fixed
+- Fixes an issue where conditionals would not work inside element slideouts for new entries or categories created via their fieldtypes    
+
+### Changed
+- Reasons now requires Craft 3.7.0+  
+- Reasons now requires PHP 7.2.5+  
+
 ## 2.2.6 - 2022-01-13
 ### Fixed
 - Fixes an issue where Reasons could create a significant amount of duplicate database queries inside the control panel. Fixes #15.
