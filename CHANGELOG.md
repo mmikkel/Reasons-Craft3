@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## 2.3.0 - 2022-05-21
 
-> {warning} Craft 4.0 has been released, finally adding field layout conditionals to core! As such Reasons has become redundant, and will not be upgraded to support Craft 4 or later releases. Before upgrading your site to Craft 4, make sure to note any conditionals that you'll want to re-create using the core feature, before uninstalling Reasons.      
+> {warning} Craft 4.0 has been released, finally adding field layout conditionals to core! As such Reasons has become redundant, and will not be upgraded to support Craft 4 or later releases. **Before upgrading your site to Craft 4, make sure to note any conditionals that you'll need to re-create using the core feature, before uninstalling Reasons.**      
 
 ### Fixed
 - Fixes an issue where conditionals would not work inside element slideouts for new entries or categories created via their fieldtypes    
