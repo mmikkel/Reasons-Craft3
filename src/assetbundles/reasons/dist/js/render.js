@@ -317,8 +317,27 @@
                                 case 'craft\\fields\\Checkboxes':
                                 case 'craft\\fields\\RadioButtons':
                                     toggleFieldValue = $toggleField.find('.input input:checkbox:checked,.input input:radio:checked').map(function () {
-                                        return $(this).val();
+                                        var value = $(this).val();
+                                        if (value.startsWith('base64:')) {
+                                            try {
+                                                value = atob(value.split('base64:').pop());
+                                            } catch (error) {
+                                                console.error(error);
+                                            }
+                                        }
+                                        return value;
                                     }).get();
+                                    break;
+                                case 'craft\\fields\\Dropdown':
+                                    $toggleFieldInput = $toggleField.find('.input select:first');
+                                    toggleFieldValue = $toggleFieldInput.val();
+                                    if (toggleFieldValue.startsWith('base64:')) {
+                                        try {
+                                            toggleFieldValue = atob(toggleFieldValue.split('base64:').pop());
+                                        } catch (error) {
+                                            console.error(error);
+                                        }
+                                    }
                                     break;
                                 case 'craft\\fields\\Entries':
                                 case 'craft\\fields\\Categories':
